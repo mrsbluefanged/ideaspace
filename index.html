@@ -302,7 +302,17 @@ h1,h2,h3,.display{font-family:"Nunito",system-ui,sans-serif}
   </div>
   <div class="field">
     <label for="formInput">"Share my idea" form link</label>
-    <input id="formInput" type="url" placeholder="https://forms.office.com/..." />
+    <input id="formInput" type="url" placeholder="https://forms.google.com/..." />
+  </div>
+  <div class="field">
+    <label for="csvInput">Published Google Sheet CSV link</label>
+    <input id="csvInput" type="url" placeholder="https://docs.google.com/spreadsheets/d/e/.../pub?output=csv" />
+    <p class="hint">Optional. If provided, the app reads ideas from this published CSV instead of requiring manual uploads.</p>
+  </div>
+  <div class="field">
+    <label for="refreshInput">Auto-refresh interval, in seconds</label>
+    <input id="refreshInput" type="number" min="10" step="5" placeholder="30" />
+    <p class="hint">For live events, 30–60 seconds is usually enough.</p>
   </div>
   <div class="note" style="margin-top:4px">Teams, categories and featured cards are read straight from your file. Add a Featured column and put y on the rows you want to spotlight.</div>
   <div class="divider"></div>
@@ -353,8 +363,17 @@ var CAT_COLORS=["#2F6BED","#1FA971","#8B5CF6","#F59E0B","#EC4899","#0EA5E9","#14
 
 function loadConfig(){
   try{ var c=JSON.parse(localStorage.getItem(STORE+"_cfg"))||{};
-    return {question:c.question||"What is your idea to help our office improve?",formUrl:c.formUrl||"",size:c.size||"17",viewMode:c.viewMode||"cards"};
-  }catch(e){ return {question:"What is your idea to help our office improve?",formUrl:"",size:"17",viewMode:"cards"}; }
+    return {
+      question:c.question||"What is your idea to help our office improve?",
+      formUrl:c.formUrl||"",
+      ideasCsvUrl:c.ideasCsvUrl||"",
+      refreshSeconds:c.refreshSeconds||"30",
+      size:c.size||"17",
+      viewMode:c.viewMode||"cards"
+    };
+  }catch(e){
+    return {question:"What is your idea to help our office improve?",formUrl:"",ideasCsvUrl:"",refreshSeconds:"30",size:"17",viewMode:"cards"};
+  }
 }
 function saveConfig(){ localStorage.setItem(STORE+"_cfg",JSON.stringify(CONFIG)); }
 
@@ -578,9 +597,9 @@ function init(){
   $("textScrim").onclick=function(){ closeSheet("textScrim","textSheet"); };
   Array.prototype.forEach.call(document.querySelectorAll("#sizes button"),function(b){ b.onclick=function(){ applySize(b.dataset.size); }; });
 
-  $("gearBtn").onclick=function(){ $("qInput").value=CONFIG.question; $("formInput").value=CONFIG.formUrl; $("cfgNote").style.display=deployedConfig?"block":"none"; var n=doneCount(); $("restoreBtn").textContent="Restore checked-off ideas"+(n?" ("+n+")":""); $("restoreBtn").disabled=!n; openSheet("setScrim","setSheet"); };
+  $("gearBtn").onclick=function(){ $("qInput").value=CONFIG.question; $("formInput").value=CONFIG.formUrl; $("csvInput").value=CONFIG.ideasCsvUrl||""; $("refreshInput").value=CONFIG.refreshSeconds||"30"; $("cfgNote").style.display=deployedConfig?"block":"none"; var n=doneCount(); $("restoreBtn").textContent="Restore checked-off ideas"+(n?" ("+n+")":""); $("restoreBtn").disabled=!n; openSheet("setScrim","setSheet"); };
   $("restoreBtn").onclick=function(){ restoreDone(); closeSheet("setScrim","setSheet"); };
-  $("setDone").onclick=function(){ CONFIG.question=$("qInput").value.trim()||CONFIG.question; CONFIG.formUrl=$("formInput").value.trim(); saveConfig(); $("qText").textContent=CONFIG.question; closeSheet("setScrim","setSheet"); };
+  $("setDone").onclick=function(){ CONFIG.question=$("qInput").value.trim()||CONFIG.question; CONFIG.formUrl=$("formInput").value.trim(); CONFIG.ideasCsvUrl=$("csvInput").value.trim(); CONFIG.refreshSeconds=$("refreshInput").value.trim()||"30"; saveConfig(); $("qText").textContent=CONFIG.question; closeSheet("setScrim","setSheet"); fetchIdeas(); startAutoRefresh(); };
   $("setScrim").onclick=function(){ closeSheet("setScrim","setSheet"); };
   $("exportBtn").onclick=exportResults;
 
@@ -590,17 +609,42 @@ function init(){
     DATA.push({id:rid(),text:t,name:$("aiName").value.trim(),team:$("aiTeam").value.trim(),category:$("aiCat").value.trim(),featured:$("aiFeat").checked}); computeFacets();
     $("aiText").value=""; $("aiName").value=""; closeSheet("addScrim","addSheet"); idx=0; refresh(); announce("Idea added to the board."); };
 
-  loadConfigFile(fetchIdeas);
+  loadConfigFile(function(){ fetchIdeas(); startAutoRefresh(); });
 }
 function loadConfigFile(done){
   fetch("./config.json",{cache:"no-store"}).then(function(r){ if(!r.ok) throw 0; return r.json(); })
-    .then(function(cfg){ if(cfg.question){ CONFIG.question=cfg.question; } if(cfg.formUrl){ CONFIG.formUrl=cfg.formUrl; } deployedConfig=true; $("qText").textContent=CONFIG.question; })
+    .then(function(cfg){
+      if(cfg.question){ CONFIG.question=cfg.question; }
+      if(cfg.formUrl){ CONFIG.formUrl=cfg.formUrl; }
+      if(cfg.ideasCsvUrl){ CONFIG.ideasCsvUrl=cfg.ideasCsvUrl; }
+      if(cfg.refreshSeconds){ CONFIG.refreshSeconds=String(cfg.refreshSeconds); }
+      deployedConfig=true;
+      $("qText").textContent=CONFIG.question;
+    })
     .catch(function(){}).then(done);
 }
 function fetchIdeas(){
+  var url=(CONFIG.ideasCsvUrl||"").trim();
+  if(url){
+    fetch(url,{cache:"no-store"}).then(function(r){ if(!r.ok) throw 0; return r.text(); })
+      .then(function(t){ setData(parseCSV(t),"Google Sheet"); })
+      .catch(function(){ fetchLocalIdeas(); announce("Could not load Google Sheet. Showing local ideas file if available."); });
+  } else {
+    fetchLocalIdeas();
+  }
+}
+function fetchLocalIdeas(){
   fetch("./ideas.json",{cache:"no-store"}).then(function(r){ if(!r.ok) throw 0; return r.json(); })
     .then(function(j){ setData(Array.isArray(j)?j:(j.ideas||[]),"ideas.json"); })
     .catch(function(){ fetch("./ideas.csv",{cache:"no-store"}).then(function(r){ if(!r.ok) throw 0; return r.text(); }).then(function(t){ setData(parseCSV(t),"ideas.csv"); }).catch(function(){}); });
+}
+var autoRefreshTimer=null;
+function startAutoRefresh(){
+  if(autoRefreshTimer){ clearInterval(autoRefreshTimer); autoRefreshTimer=null; }
+  if(!CONFIG.ideasCsvUrl) return;
+  var seconds=parseInt(CONFIG.refreshSeconds||"30",10);
+  if(isNaN(seconds)||seconds<10) seconds=30;
+  autoRefreshTimer=setInterval(fetchIdeas,seconds*1000);
 }
 document.addEventListener("DOMContentLoaded",init);
 </script>
