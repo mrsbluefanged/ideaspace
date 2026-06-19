@@ -295,7 +295,7 @@ h1,h2,h3,.display{font-family:"Nunito",system-ui,sans-serif}
   <div class="grab"></div>
   <h2>Organizer settings</h2>
   <p class="hint">For the facilitator. Participants do not need any of this.</p>
-  <div class="note" id="cfgNote" style="display:none;margin-top:10px">The question and form link come from your deployed config.json, so they match on every device. To change them for everyone, edit config.json and redeploy.</div>
+  <div class="note" id="cfgNote" style="display:none;margin-top:10px">The question, form link and Google Sheet link come from your deployed config.json. With project links, use ?project=project-id to open a specific project.</div>
   <div class="field">
     <label for="qInput">Question</label>
     <input id="qInput" type="text" placeholder="What is your idea to improve efficiency?" />
@@ -355,7 +355,7 @@ var deployedConfig=false;
 var DONE=loadDone();
 function loadDone(){ try{ return JSON.parse(localStorage.getItem(STORE+"_done"))||{}; }catch(e){ return {}; } }
 function saveDone(){ localStorage.setItem(STORE+"_done",JSON.stringify(DONE)); }
-function doneKey(d){ return (d.text||"").trim().toLowerCase(); }
+function doneKey(d){ return (CONFIG.projectId||"default")+"::"+(d.text||"").trim().toLowerCase(); }
 function isDone(d){ return !!DONE[doneKey(d)]; }
 function doneCount(){ return DATA.filter(isDone).length; }
 function markDone(id){ var d=DATA.find(function(x){return x.id===id;}); if(d){ DONE[doneKey(d)]=true; saveDone(); refresh(); announce("Idea checked off and hidden."); } }
@@ -369,11 +369,13 @@ function loadConfig(){
       formUrl:c.formUrl||"",
       ideasCsvUrl:c.ideasCsvUrl||"",
       refreshSeconds:c.refreshSeconds||"30",
+      projectId:c.projectId||"default",
+      projectName:c.projectName||"",
       size:c.size||"17",
       viewMode:c.viewMode||"cards"
     };
   }catch(e){
-    return {question:"What is your idea to help our office improve?",formUrl:"",ideasCsvUrl:"",refreshSeconds:"30",size:"17",viewMode:"cards"};
+    return {question:"What is your idea to help our office improve?",formUrl:"",ideasCsvUrl:"",refreshSeconds:"30",projectId:"default",projectName:"",size:"17",viewMode:"cards"};
   }
 }
 function saveConfig(){ localStorage.setItem(STORE+"_cfg",JSON.stringify(CONFIG)); }
@@ -610,17 +612,42 @@ function init(){
     DATA.push({id:rid(),text:t,name:$("aiName").value.trim(),team:$("aiTeam").value.trim(),category:$("aiCat").value.trim(),featured:$("aiFeat").checked}); computeFacets();
     $("aiText").value=""; $("aiName").value=""; closeSheet("addScrim","addSheet"); idx=0; refresh(); announce("Idea added to the board."); };
 
-  loadConfigFile(fetchIdeas);
+  loadConfigFile(function(){ fetchIdeas(); startAutoRefresh(); });
+}
+function getProjectFromConfig(cfg){
+  if(!cfg || !Array.isArray(cfg.projects) || !cfg.projects.length) return null;
+  var params=new URLSearchParams(window.location.search);
+  var requested=(params.get("project")||cfg.defaultProject||cfg.projects[0].id||"").trim();
+  var found=cfg.projects.find(function(p){ return String(p.id||"").toLowerCase()===requested.toLowerCase(); });
+  return found || cfg.projects[0];
+}
+function applyProjectConfig(project){
+  if(!project) return;
+  CONFIG.projectId=project.id||"default";
+  CONFIG.projectName=project.name||project.id||"";
+  CONFIG.question=project.question||CONFIG.question;
+  CONFIG.formUrl=project.formUrl||"";
+  CONFIG.ideasCsvUrl=project.ideasCsvUrl||"";
+  CONFIG.refreshSeconds=String(project.refreshSeconds||CONFIG.refreshSeconds||"30");
+  $("qText").textContent=CONFIG.question;
 }
 function loadConfigFile(done){
   fetch("./config.json",{cache:"no-store"}).then(function(r){ if(!r.ok) throw 0; return r.json(); })
     .then(function(cfg){
-      if(cfg.question){ CONFIG.question=cfg.question; }
-      if(cfg.formUrl){ CONFIG.formUrl=cfg.formUrl; }
-      if(cfg.ideasCsvUrl){ CONFIG.ideasCsvUrl=cfg.ideasCsvUrl; }
-      if(cfg.refreshSeconds){ CONFIG.refreshSeconds=String(cfg.refreshSeconds); }
+      var project=getProjectFromConfig(cfg);
+      if(project){
+        applyProjectConfig(project);
+      } else {
+        if(cfg.question){ CONFIG.question=cfg.question; }
+        if(cfg.formUrl){ CONFIG.formUrl=cfg.formUrl; }
+        if(cfg.ideasCsvUrl){ CONFIG.ideasCsvUrl=cfg.ideasCsvUrl; }
+        if(cfg.refreshSeconds){ CONFIG.refreshSeconds=String(cfg.refreshSeconds); }
+        CONFIG.projectId="default";
+        CONFIG.projectName="";
+        $("qText").textContent=CONFIG.question;
+      }
       deployedConfig=true;
-      $("qText").textContent=CONFIG.question;
+      saveConfig();
     })
     .catch(function(){}).then(done);
 }
@@ -647,7 +674,7 @@ function startAutoRefresh(){
   if(isNaN(seconds)||seconds<10) seconds=30;
   autoRefreshTimer=setInterval(fetchIdeas,seconds*1000);
 }
-document.addEventListener("DOMContentLoaded",function(){ init(); startAutoRefresh(); });
+document.addEventListener("DOMContentLoaded",init);
 </script>
 </body>
 </html>
