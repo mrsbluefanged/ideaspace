@@ -124,7 +124,7 @@ h1,h2,h3,.display{font-family:"Nunito",system-ui,sans-serif}
 .bento-big,.bento-small{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px;box-shadow:var(--shadow-soft);display:flex;flex-direction:column;overflow:hidden}
 .bento-small{cursor:pointer;transition:border-color .12s ease, transform .12s ease}
 .bento-small:hover{border-color:color-mix(in srgb,var(--primary) 45%,#fff);transform:translateY(-2px)}
-.bento-big{grid-column:span 2;grid-row:span 2;padding:28px;border-radius:var(--radius-card);box-shadow:var(--shadow-card)}
+.bento-big{grid-column:1 / span 2;grid-row:1 / span 2;padding:28px;border-radius:var(--radius-card);box-shadow:var(--shadow-card)}
 .bento-big.isfeat,.bento-small.isfeat{border-color:color-mix(in srgb,var(--spark-deep) 42%,#fff)}
 .bento-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}
 .bento-big .big-text{font-family:"Nunito",sans-serif;font-weight:800;letter-spacing:-.02em;line-height:1.14;font-size:2.3rem;flex:1;display:flex;align-items:center;overflow:auto}
@@ -178,7 +178,7 @@ h1,h2,h3,.display{font-family:"Nunito",system-ui,sans-serif}
 }
 @media (max-width:600px){
   .present{grid-template-columns:1fr;grid-auto-rows:auto}
-  .bento-big{grid-column:span 1;grid-row:span 1}
+  .bento-big{grid-column:1 / -1;grid-row:auto}
   .bento-big .big-text{font-size:1.6rem}
 }
 @media (max-width:380px){ .question{font-size:1.42rem} .idea-text{font-size:1.32rem} }
