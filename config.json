@@ -1,6 +1,45 @@
 {
-  "question": "What is your idea to help our office improve efficiency?",
-  "formUrl": "https://forms.gle/fFz87wofEFydxYXG6",
-  "ideasCsvUrl": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRVJKAaduPFwok5P-Jh6Tmvzr2Tuh6vEaaWweqgGasrqcw_hgrAUxZxUvkzpDpnRA6QWxZR6Mh0ijzx/pub?output=csv",
-  "refreshSeconds": 30
+  "defaultProject": "efficiency",
+  "projects": [
+    {
+      "id": "session1",
+      "name": "Session1",
+      "question": "What is your idea to help our office improve efficiency?",
+      "formUrl": "PASTE_GOOGLE_FORM_LINK_1_HERE",
+      "ideasCsvUrl": "PASTE_PUBLISHED_GOOGLE_SHEET_CSV_LINK_1_HERE",
+      "refreshSeconds": 30
+    },
+    {
+      "id": "RM",
+      "name": "RM",
+      "question": "What are your 3 commitments to help achieve our office’s fundraising targets?",
+      "formUrl": "https://docs.google.com/forms/d/e/1FAIpQLSdhQjaBN2IqONjBpmLyOi6Q39VxIYc-uQ2ArgASAMmxGu9G1A/viewform?fbzx=5781501051050625629",
+      "ideasCsvUrl": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRVJKAaduPFwok5P-Jh6Tmvzr2Tuh6vEaaWweqgGasrqcw_hgrAUxZxUvkzpDpnRA6QWxZR6Mh0ijzx/pub?output=csv",
+      "refreshSeconds": 30
+    },
+    {
+      "id": "operations",
+      "name": "Operations",
+      "question": "What operational process should we improve?",
+      "formUrl": "PASTE_GOOGLE_FORM_LINK_3_HERE",
+      "ideasCsvUrl": "PASTE_PUBLISHED_GOOGLE_SHEET_CSV_LINK_3_HERE",
+      "refreshSeconds": 30
+    },
+    {
+      "id": "learning",
+      "name": "Learning ideas",
+      "question": "What learning activity or support would help staff work better?",
+      "formUrl": "PASTE_GOOGLE_FORM_LINK_4_HERE",
+      "ideasCsvUrl": "PASTE_PUBLISHED_GOOGLE_SHEET_CSV_LINK_4_HERE",
+      "refreshSeconds": 30
+    },
+    {
+      "id": "innovation",
+      "name": "Innovation ideas",
+      "question": "What innovation idea should we test next?",
+      "formUrl": "PASTE_GOOGLE_FORM_LINK_5_HERE",
+      "ideasCsvUrl": "PASTE_PUBLISHED_GOOGLE_SHEET_CSV_LINK_5_HERE",
+      "refreshSeconds": 30
+    }
+  ]
 }
