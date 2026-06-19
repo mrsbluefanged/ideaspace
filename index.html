@@ -98,6 +98,13 @@ h1,h2,h3,.display{font-family:"Nunito",system-ui,sans-serif}
 .checkbtn{flex:0 0 auto;width:34px;height:34px;border-radius:10px;border:1px solid var(--line);background:#fff;color:var(--ink-faint);display:grid;place-items:center;cursor:pointer;transition:background .12s ease,color .12s ease,border-color .12s ease,transform .12s ease}
 .checkbtn:hover{border-color:var(--good);color:var(--good);background:color-mix(in srgb,var(--good) 10%,#fff)}
 .checkbtn:active{transform:scale(.9)}
+.checkbtn.is-shortlisted{border-color:#8B5CF6;color:#8B5CF6;background:color-mix(in srgb,#8B5CF6 10%,#fff)}
+.checkbtn.is-done{border-color:var(--good);color:var(--good);background:color-mix(in srgb,var(--good) 10%,#fff)}
+.status-badge{display:inline-flex;align-items:center;gap:4px;font-weight:800;font-size:.72rem;padding:5px 10px;border-radius:999px;white-space:nowrap;border:1px solid var(--line)}
+.status-badge.shortlisted{color:#8B5CF6;background:color-mix(in srgb,#8B5CF6 12%,#fff);border-color:color-mix(in srgb,#8B5CF6 30%,#fff)}
+.status-badge.done{color:var(--good);background:color-mix(in srgb,var(--good) 12%,#fff);border-color:color-mix(in srgb,var(--good) 30%,#fff)}
+.card.status-done,.bitem.status-done,.bento-big.status-done,.bento-small.status-done{opacity:.7}
+.bitem.status-shortlisted,.bento-big.status-shortlisted,.bento-small.status-shortlisted,.card.status-shortlisted{border-color:color-mix(in srgb,#8B5CF6 35%,#fff)}
 .idea-text{font-family:"Nunito",sans-serif;font-weight:800;letter-spacing:-.01em;font-size:1.5rem;line-height:1.28;margin:10px 0;flex:1;display:flex;align-items:center;overflow:auto}
 .idea-text.long{font-size:1.18rem}
 .idea-text.vlong{font-size:1rem;align-items:flex-start}
@@ -224,6 +231,15 @@ h1,h2,h3,.display{font-family:"Nunito",system-ui,sans-serif}
       <select id="catSel" aria-label="Filter by category"><option value="all">All categories</option></select>
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </div>
+    <div class="select">
+      <select id="statusSel" aria-label="Filter by status">
+        <option value="all">All statuses</option>
+        <option value="open">Open</option>
+        <option value="shortlisted">Shortlisted</option>
+        <option value="done">Done</option>
+      </select>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
   </div>
 
   <div class="viewtoggle" id="viewToggle" role="group" aria-label="Layout" hidden>
@@ -323,7 +339,7 @@ h1,h2,h3,.display{font-family:"Nunito",system-ui,sans-serif}
   </div>
   <div class="divider"></div>
   <button class="btn secondary" id="addBtn" style="width:100%">Add an idea by hand</button>
-  <button class="btn secondary" id="restoreBtn" style="width:100%;margin-top:10px">Restore checked-off ideas</button>
+  <button class="btn secondary" id="restoreBtn" style="width:100%;margin-top:10px">Reset idea statuses</button>
   <button class="btn" id="setDone" style="margin-top:18px;width:100%">Done</button>
 </section>
 
@@ -352,14 +368,15 @@ var DATA=[];            // [{id,text,name,team,category,featured}]
 var CATS=[], TEAMS=[];
 var view=[], idx=0;
 var deployedConfig=false;
-var DONE=loadDone();
-function loadDone(){ try{ return JSON.parse(localStorage.getItem(STORE+"_done"))||{}; }catch(e){ return {}; } }
-function saveDone(){ localStorage.setItem(STORE+"_done",JSON.stringify(DONE)); }
-function doneKey(d){ return (CONFIG.projectId||"default")+"::"+(d.text||"").trim().toLowerCase(); }
-function isDone(d){ return !!DONE[doneKey(d)]; }
-function doneCount(){ return DATA.filter(isDone).length; }
-function markDone(id){ var d=DATA.find(function(x){return x.id===id;}); if(d){ DONE[doneKey(d)]=true; saveDone(); refresh(); announce("Idea checked off and hidden."); } }
-function restoreDone(){ DONE={}; saveDone(); refresh(); announce("All checked-off ideas restored."); }
+var STATUSES=loadStatuses();
+function loadStatuses(){ try{ return JSON.parse(localStorage.getItem(STORE+"_statuses"))||{}; }catch(e){ return {}; } }
+function saveStatuses(){ localStorage.setItem(STORE+"_statuses",JSON.stringify(STATUSES)); }
+function statusKey(d){ return (CONFIG.projectId||"default")+"::"+(d.text||"").trim().toLowerCase(); }
+function getStatus(d){ return STATUSES[statusKey(d)]||"open"; }
+function statusCount(status){ return DATA.filter(function(d){ return getStatus(d)===status; }).length; }
+function cycleStatus(id){ var d=DATA.find(function(x){return x.id===id;}); if(!d) return; var cur=getStatus(d), next=cur==="open"?"shortlisted":(cur==="shortlisted"?"done":"open"); if(next==="open") delete STATUSES[statusKey(d)]; else STATUSES[statusKey(d)]=next; saveStatuses(); refresh(); announce("Idea status changed to "+statusLabel(next)+"."); }
+function resetStatuses(){ STATUSES={}; saveStatuses(); refresh(); announce("All idea statuses reset to open."); }
+function statusLabel(status){ return status==="shortlisted"?"Shortlisted":(status==="done"?"Done":"Open"); }
 var CAT_COLORS=["#2F6BED","#1FA971","#8B5CF6","#F59E0B","#EC4899","#0EA5E9","#14B8A6","#64748B"];
 
 function loadConfig(){
@@ -442,12 +459,12 @@ function loadSheetJS(cb){ if(sjsReady) return cb(true); sjsCbs.push(cb); if(sjsL
 
 /* ---------- view ---------- */
 function buildView(){
-  var cat=$("catSel").value, team=$("teamSel").value, sort=$("sortSel").value;
+  var cat=$("catSel").value, team=$("teamSel").value, sort=$("sortSel").value, status=$("statusSel")?$("statusSel").value:"all";
   view=DATA.filter(function(d){
-    if(isDone(d)) return false;
     var okC = cat==="all"||String(d.category).toLowerCase()===cat.toLowerCase();
     var okT = team==="all"||String(d.team).toLowerCase()===team.toLowerCase();
-    return okC&&okT;
+    var okS = status==="all"||getStatus(d)===status;
+    return okC&&okT&&okS;
   });
   if(sort==="random"){ view.sort(function(){ return Math.random()-.5; }); }
   else { view.reverse(); if(sort==="featured") view.sort(function(a,b){ return (b.featured?1:0)-(a.featured?1:0); }); }
@@ -468,10 +485,13 @@ function renderStats(){
   var el=$("stats"); if(!DATA.length){ el.innerHTML=""; return; }
   var people={}; DATA.forEach(function(d){ if(d.name) people[d.name.toLowerCase()]=true; });
   var feat=DATA.filter(function(d){return d.featured;}).length;
+  var short=statusCount("shortlisted"), done=statusCount("done");
   el.innerHTML=statChip("💡",DATA.length,DATA.length===1?"idea":"ideas")
     +(Object.keys(people).length?statChip("🙋",Object.keys(people).length,"people"):"")
     +(TEAMS.length?statChip("👥",TEAMS.length,TEAMS.length===1?"team":"teams"):"")
-    +(feat?statChip("★",feat,"featured"):"");
+    +(feat?statChip("★",feat,"featured"):"")
+    +(short?statChip("◆",short,"shortlisted"):"")
+    +(done?statChip("✓",done,"done"):"");
 }
 function statChip(icon,n,label){ return '<div class="stat"><b>'+icon+" "+n+'</b><span>'+esc(label)+'</span></div>'; }
 function renderControls(){
@@ -488,7 +508,9 @@ function renderControls(){
 }
 function lenClass(t){ var n=t.length; return n>220?"vlong":(n>110?"long":""); }
 function featBadge(){ return '<span class="feat">★ Featured</span>'; }
-function checkBtnHTML(id){ return '<button class="checkbtn" data-check="'+id+'" aria-label="Check off and hide this idea" title="Check off"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="m5 13 4 4 10-11" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>'; }
+function statusBadge(d){ var st=getStatus(d); if(st==="open") return ""; return '<span class="status-badge '+st+'">'+(st==="shortlisted"?'◆ Shortlisted':'✓ Done')+'</span>'; }
+function checkBtnHTML(d){ var st=getStatus(d), cls=st==="open"?"":(st==="shortlisted"?" is-shortlisted":" is-done"), next=st==="open"?"Shortlist this idea":(st==="shortlisted"?"Mark as done":"Reset to open"); return '<button class="checkbtn'+cls+'" data-check="'+d.id+'" aria-label="'+next+'" title="'+next+'"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="m5 13 4 4 10-11" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>'; }
+function statusClass(d){ var st=getStatus(d); return st==="open"?"":" status-"+st; }
 function chipHTML(cat){ return cat?'<span class="chip" style="--chip:'+catColor(cat)+'"><span class="cdot"></span>'+esc(cat)+'</span>':''; }
 function bylineHTML(d){ return '<div class="byline">'+(d.name?esc(d.name):'<span class="anon">Anonymous</span>')+(d.team?'<span class="team-tag">'+esc(d.team)+'</span>':'')+'</div>'; }
 
@@ -496,14 +518,15 @@ function renderCard(){
   var c=$("card");
   if(!view.length){ c.innerHTML='<div class="idea-text" style="color:var(--ink-faint);font-size:1.1rem">No ideas in this filter.</div>'; $("counter").innerHTML='0 / 0<small>try another filter</small>'; $("prevBtn").disabled=$("nextBtn").disabled=true; return; }
   if(idx>=view.length) idx=0; var d=view[idx];
-  c.innerHTML='<div class="card-top"><div class="ct-tags">'+(d.featured?featBadge():'')+chipHTML(d.category)+'</div>'+checkBtnHTML(d.id)+'</div>'
+  c.className='card'+statusClass(d);
+  c.innerHTML='<div class="card-top"><div class="ct-tags">'+(d.featured?featBadge():'')+statusBadge(d)+chipHTML(d.category)+'</div>'+checkBtnHTML(d)+'</div>'
     +'<div class="idea-text '+lenClass(d.text)+'">'+esc(d.text)+'</div>'+bylineHTML(d);
   $("counter").innerHTML=(idx+1)+' / '+view.length+'<small>swipe or use arrows</small>';
   $("prevBtn").disabled=idx<=0; $("nextBtn").disabled=idx>=view.length-1;
   announce("Idea "+(idx+1)+" of "+view.length+(d.featured?", featured":"")+(d.category?", "+d.category:"")+". "+d.text+(d.name?". By "+d.name:". Anonymous"));
 }
 function boardItemHTML(d){
-  return '<article class="bitem'+(d.featured?' isfeat':'')+'"><div class="bitem-head"><div class="ct-tags">'+(d.featured?featBadge():'')+chipHTML(d.category)+'</div>'+checkBtnHTML(d.id)+'</div>'
+  return '<article class="bitem'+(d.featured?' isfeat':'')+statusClass(d)+'"><div class="bitem-head"><div class="ct-tags">'+(d.featured?featBadge():'')+statusBadge(d)+chipHTML(d.category)+'</div>'+checkBtnHTML(d)+'</div>'
     +'<div class="bitem-text">'+esc(d.text)+'</div>'+bylineHTML(d)+'</article>';
 }
 function renderBoard(){
@@ -514,15 +537,15 @@ function renderBoard(){
 }
 function bentoCardHTML(d,big){
   var tag=big?'big':'small';
-  return '<article class="bento-'+tag+(d.featured?' isfeat':'')+'" data-id="'+d.id+'">'
-    +'<div class="bento-head"><div class="ct-tags">'+(d.featured?featBadge():'')+chipHTML(d.category)+'</div>'+checkBtnHTML(d.id)+'</div>'
+  return '<article class="bento-'+tag+(d.featured?' isfeat':'')+statusClass(d)+'" data-id="'+d.id+'">'
+    +'<div class="bento-head"><div class="ct-tags">'+(d.featured?featBadge():'')+statusBadge(d)+chipHTML(d.category)+'</div>'+checkBtnHTML(d)+'</div>'
     +'<div class="'+(big?'big-text '+lenClass(d.text):'qi-text')+'">'+esc(d.text)+'</div>'
     +'<div class="'+(big?'big-by':'qi-by')+'">'+(d.name?esc(d.name):(big?'<span class="anon">Anonymous</span>':'Anonymous'))+(d.team?(big?'<span class="big-team">'+esc(d.team)+'</span>':' · '+esc(d.team)):'')+'</div>'
     +'</article>';
 }
 function renderPresent(){
   var wrap=$("present");
-  if(!view.length){ wrap.innerHTML='<div style="grid-column:1/-1;color:var(--ink-faint);text-align:center;padding:50px 0">No ideas to show. They may all be checked off, or filtered out.</div>'; return; }
+  if(!view.length){ wrap.innerHTML='<div style="grid-column:1/-1;color:var(--ink-faint);text-align:center;padding:50px 0">No ideas to show in this filter.</div>'; return; }
   if(idx>=view.length) idx=0;
   var html=bentoCardHTML(view[idx],true);
   view.forEach(function(d,i){ if(i!==idx) html+=bentoCardHTML(d,false); });
@@ -530,10 +553,10 @@ function renderPresent(){
   announce("Showing "+view.length+" ideas. Big card: "+view[idx].text);
 }
 
-/* clicks: check off any card, or promote a small bento card to the big slot */
+/* clicks: change the status of any card, or promote a small bento card to the big slot */
 document.addEventListener("click",function(e){
   var cb=e.target.closest("[data-check]");
-  if(cb){ markDone(cb.getAttribute("data-check")); return; }
+  if(cb){ cycleStatus(cb.getAttribute("data-check")); return; }
   var sm=e.target.closest(".bento-small");
   if(sm){ var i=view.findIndex(function(x){return x.id===sm.dataset.id;}); if(i>=0){ idx=i; renderPresent(); } }
 });
@@ -585,6 +608,7 @@ function init(){
   $("sortSel").onchange=function(){ idx=0; refresh(); };
   $("catSel").onchange=function(){ idx=0; refresh(); };
   $("teamSel").onchange=function(){ idx=0; refresh(); };
+  $("statusSel").onchange=function(){ idx=0; refresh(); };
   $("prevBtn").onclick=function(){ go(-1); };
   $("nextBtn").onclick=function(){ go(1); };
   Array.prototype.forEach.call($("viewToggle").children,function(b){ b.onclick=function(){ setView(b.dataset.mode); }; });
@@ -600,8 +624,8 @@ function init(){
   $("textScrim").onclick=function(){ closeSheet("textScrim","textSheet"); };
   Array.prototype.forEach.call(document.querySelectorAll("#sizes button"),function(b){ b.onclick=function(){ applySize(b.dataset.size); }; });
 
-  $("gearBtn").onclick=function(){ $("qInput").value=CONFIG.question; $("formInput").value=CONFIG.formUrl; $("csvInput").value=CONFIG.ideasCsvUrl||""; $("refreshInput").value=CONFIG.refreshSeconds||"30"; $("cfgNote").style.display=deployedConfig?"block":"none"; var n=doneCount(); $("restoreBtn").textContent="Restore checked-off ideas"+(n?" ("+n+")":""); $("restoreBtn").disabled=!n; openSheet("setScrim","setSheet"); };
-  $("restoreBtn").onclick=function(){ restoreDone(); closeSheet("setScrim","setSheet"); };
+  $("gearBtn").onclick=function(){ $("qInput").value=CONFIG.question; $("formInput").value=CONFIG.formUrl; $("csvInput").value=CONFIG.ideasCsvUrl||""; $("refreshInput").value=CONFIG.refreshSeconds||"30"; $("cfgNote").style.display=deployedConfig?"block":"none"; var n=Object.keys(STATUSES).length; $("restoreBtn").textContent="Reset idea statuses"+(n?" ("+n+")":""); $("restoreBtn").disabled=!n; openSheet("setScrim","setSheet"); };
+  $("restoreBtn").onclick=function(){ resetStatuses(); closeSheet("setScrim","setSheet"); };
   $("setDone").onclick=function(){ CONFIG.question=$("qInput").value.trim()||CONFIG.question; CONFIG.formUrl=$("formInput").value.trim(); CONFIG.ideasCsvUrl=$("csvInput").value.trim(); CONFIG.refreshSeconds=$("refreshInput").value.trim()||"30"; saveConfig(); $("qText").textContent=CONFIG.question; closeSheet("setScrim","setSheet"); fetchIdeas(); startAutoRefresh(); };
   $("setScrim").onclick=function(){ closeSheet("setScrim","setSheet"); };
   $("exportBtn").onclick=exportResults;
