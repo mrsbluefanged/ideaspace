@@ -2,11 +2,11 @@
   "defaultProject": "s1",
   "projects": [
     {
-      "id": "s1",
-      "name": "S1",
-      "question": "Test",
-      "formUrl": "https://docs.google.com/forms/d/e/1FAIpQLSdhQjaBN2IqONjBpmLyOi6Q39VxIYc-uQ2ArgASAMmxGu9G1A/viewform?fbzx=5781501051050625629",
-      "ideasCsvUrl": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRVJKAaduPFwok5P-Jh6Tmvzr2Tuh6vEaaWweqgGasrqcw_hgrAUxZxUvkzpDpnRA6QWxZR6Mh0ijzx/pub?output=csv",
+      "id": "MF",
+      "name": "MTR Feedback",
+      "question": "MTR Feedback",
+      "formUrl": "https://forms.gle/7JTXjZRnkW78pP4z7",
+      "ideasCsvUrl": "https://docs.google.com/spreadsheets/d/e/2PACX-1vSh-S9rsiyUW1up-_0XzwqUej6vV8-uHl_bXDSyUiXJpVeyyKAapeD7MjnFWdLnh1DRmiIl54sbJ3xa/pub?output=csv",
       "refreshSeconds": 30
     },
     {
