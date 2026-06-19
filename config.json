@@ -1,4 +1,6 @@
 {
   "question": "What is your idea to help our office improve efficiency?",
-  "formUrl": "https://forms.office.com/your-form-link-here"
+  "formUrl": "https://forms.gle/fFz87wofEFydxYXG6",
+  "ideasCsvUrl": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRVJKAaduPFwok5P-Jh6Tmvzr2Tuh6vEaaWweqgGasrqcw_hgrAUxZxUvkzpDpnRA6QWxZR6Mh0ijzx/pubhtml",
+  "refreshSeconds": 30
 }
