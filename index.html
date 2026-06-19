@@ -47,6 +47,7 @@
   --shadow-card:0 18px 40px -18px rgba(22,35,59,.45); --shadow-soft:0 6px 18px -10px rgba(22,35,59,.35);
 }
 *{box-sizing:border-box}
+[hidden]{display:none !important}
 html{font-size:var(--root)}
 body{margin:0;font-family:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--ink);
   background:radial-gradient(120% 60% at 50% -10%, #DDE8FF 0%, rgba(221,232,255,0) 60%),var(--canvas);min-height:100dvh;-webkit-font-smoothing:antialiased}
@@ -609,7 +610,7 @@ function init(){
     DATA.push({id:rid(),text:t,name:$("aiName").value.trim(),team:$("aiTeam").value.trim(),category:$("aiCat").value.trim(),featured:$("aiFeat").checked}); computeFacets();
     $("aiText").value=""; $("aiName").value=""; closeSheet("addScrim","addSheet"); idx=0; refresh(); announce("Idea added to the board."); };
 
-  loadConfigFile(function(){ fetchIdeas(); startAutoRefresh(); });
+  loadConfigFile(fetchIdeas);
 }
 function loadConfigFile(done){
   fetch("./config.json",{cache:"no-store"}).then(function(r){ if(!r.ok) throw 0; return r.json(); })
@@ -646,7 +647,7 @@ function startAutoRefresh(){
   if(isNaN(seconds)||seconds<10) seconds=30;
   autoRefreshTimer=setInterval(fetchIdeas,seconds*1000);
 }
-document.addEventListener("DOMContentLoaded",init);
+document.addEventListener("DOMContentLoaded",function(){ init(); startAutoRefresh(); });
 </script>
 </body>
 </html>
