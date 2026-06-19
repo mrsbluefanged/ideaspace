@@ -1,12 +1,12 @@
 {
-  "defaultProject": "efficiency",
+  "defaultProject": "s1",
   "projects": [
     {
-      "id": "session1",
-      "name": "Session1",
-      "question": "What is your idea to help our office improve efficiency?",
-      "formUrl": "PASTE_GOOGLE_FORM_LINK_1_HERE",
-      "ideasCsvUrl": "PASTE_PUBLISHED_GOOGLE_SHEET_CSV_LINK_1_HERE",
+      "id": "s1",
+      "name": "S1",
+      "question": "Test",
+      "formUrl": "https://docs.google.com/forms/d/e/1FAIpQLSdhQjaBN2IqONjBpmLyOi6Q39VxIYc-uQ2ArgASAMmxGu9G1A/viewform?fbzx=5781501051050625629",
+      "ideasCsvUrl": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRVJKAaduPFwok5P-Jh6Tmvzr2Tuh6vEaaWweqgGasrqcw_hgrAUxZxUvkzpDpnRA6QWxZR6Mh0ijzx/pub?output=csv",
       "refreshSeconds": 30
     },
     {
