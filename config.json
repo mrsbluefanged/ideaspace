@@ -18,11 +18,11 @@
       "refreshSeconds": 30
     },
     {
-      "id": "operations",
-      "name": "Operations",
-      "question": "What operational process should we improve?",
-      "formUrl": "PASTE_GOOGLE_FORM_LINK_3_HERE",
-      "ideasCsvUrl": "PASTE_PUBLISHED_GOOGLE_SHEET_CSV_LINK_3_HERE",
+      "id": "EE",
+      "name": "Efficiency and Effectiveness",
+      "question": "Efficiency and Effectiveness Suggesstions",
+      "formUrl": "https://forms.gle/EQqs5pnjWtAcLyA26",
+      "ideasCsvUrl": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTcgnyph1FVLWZVyA3nf9PHyyqgcHx-FfC2oh8HEm5fsnRDtLNLC31aiV3mx4DApv0eacxykMxkOeAG/pub?output=csv",
       "refreshSeconds": 30
     },
     {
