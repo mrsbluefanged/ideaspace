@@ -40,6 +40,14 @@
       "formUrl": "https://docs.google.com/forms/d/e/1FAIpQLSfCqe3WGF2_MyuibnohrGZGDBeASJhX-7oIecyVABl_xPWk5g/viewform?usp=header",
       "ideasCsvUrl": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRcbFWUND0NHdDkG6WEC0VmSs7ZqrC210gJy2U6uW-qQPgN2iemMziirocNK1Xfr_b5ojVHxbakwwqK/pub?output=csv",
       "refreshSeconds": 30
+    },
+      {
+      "id": "prg",
+      "name": "From Shifts to Results: Taking Stock, Learning, and Accelerating Progress ",
+      "question": "What's on your mind?",
+      "formUrl": "https://docs.google.com/forms/d/e/1FAIpQLSfdjuD1FO5VfpHB8mxneCsya0400Jo5k5FablkBF-q7ls6bNw/viewform?usp=publish-editor",
+      "ideasCsvUrl": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRcbFWUND0NHdDkG6WEC0VmSs7ZqrC210gJy2U6uW-qQPgN2iemMziirocNK1Xfr_b5ojVHxbakwwqK/pub?output=csv",
+      "refreshSeconds": 30
     }
   ]
 }
