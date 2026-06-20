@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>Idea Space</title>
+<title>Ideaspace</title>
 
 <!--
 ==================================================================
@@ -63,7 +63,7 @@ h1,h2,h3,.display{font-family:"Nunito",system-ui,sans-serif}
 .iconbtn:active{transform:scale(.94)}
 .topbar-actions{display:flex;gap:8px}
 
-.question{font-family:"Nunito",sans-serif;font-weight:800;line-height:1.16;font-size:1.72rem;letter-spacing:-.02em;margin:6px 2px 4px;max-width:24ch}
+.question{font-family:"Nunito",sans-serif;font-weight:800;line-height:1.16;font-size:1.72rem;letter-spacing:-.02em;margin:6px 2px 4px;max-width:900px}
 .question .lead{display:block;font-size:.74rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--spark-deep);margin-bottom:6px}
 
 .stats{display:flex;gap:8px;margin:12px 0 4px;flex-wrap:wrap}
@@ -99,12 +99,15 @@ h1,h2,h3,.display{font-family:"Nunito",system-ui,sans-serif}
 .checkbtn:hover{border-color:var(--good);color:var(--good);background:color-mix(in srgb,var(--good) 10%,#fff)}
 .checkbtn:active{transform:scale(.9)}
 .checkbtn.is-shortlisted{border-color:#8B5CF6;color:#8B5CF6;background:color-mix(in srgb,#8B5CF6 10%,#fff)}
+.checkbtn.is-action{border-color:#F59E0B;color:#F59E0B;background:color-mix(in srgb,#F59E0B 12%,#fff)}
 .checkbtn.is-done{border-color:var(--good);color:var(--good);background:color-mix(in srgb,var(--good) 10%,#fff)}
 .status-badge{display:inline-flex;align-items:center;gap:4px;font-weight:800;font-size:.72rem;padding:5px 10px;border-radius:999px;white-space:nowrap;border:1px solid var(--line)}
 .status-badge.shortlisted{color:#8B5CF6;background:color-mix(in srgb,#8B5CF6 12%,#fff);border-color:color-mix(in srgb,#8B5CF6 30%,#fff)}
+.status-badge.action{color:#F59E0B;background:color-mix(in srgb,#F59E0B 14%,#fff);border-color:color-mix(in srgb,#F59E0B 34%,#fff)}
 .status-badge.done{color:var(--good);background:color-mix(in srgb,var(--good) 12%,#fff);border-color:color-mix(in srgb,var(--good) 30%,#fff)}
 .card.status-done,.bitem.status-done,.bento-big.status-done,.bento-small.status-done{opacity:.7}
 .bitem.status-shortlisted,.bento-big.status-shortlisted,.bento-small.status-shortlisted,.card.status-shortlisted{border-color:color-mix(in srgb,#8B5CF6 35%,#fff)}
+.bitem.status-action,.bento-big.status-action,.bento-small.status-action,.card.status-action{border-color:color-mix(in srgb,#F59E0B 45%,#fff)}
 .idea-text{font-family:"Nunito",sans-serif;font-weight:800;letter-spacing:-.01em;font-size:1.5rem;line-height:1.28;margin:10px 0;flex:1;display:flex;align-items:center;overflow:auto}
 .idea-text.long{font-size:1.18rem}
 .idea-text.vlong{font-size:1rem;align-items:flex-start}
@@ -217,8 +220,8 @@ h1,h2,h3,.display{font-family:"Nunito",system-ui,sans-serif}
   <div class="controls" id="controls" hidden>
     <div class="select">
       <select id="sortSel" aria-label="Sort ideas">
+        <option value="newest">All entries</option>
         <option value="featured">Featured first</option>
-        <option value="newest">Newest first</option>
         <option value="random">Surprise me</option>
       </select>
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -236,6 +239,7 @@ h1,h2,h3,.display{font-family:"Nunito",system-ui,sans-serif}
         <option value="all">All statuses</option>
         <option value="open">Open</option>
         <option value="shortlisted">Shortlisted</option>
+        <option value="action">Action item</option>
         <option value="done">Done</option>
       </select>
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -374,9 +378,9 @@ function saveStatuses(){ localStorage.setItem(STORE+"_statuses",JSON.stringify(S
 function statusKey(d){ return (CONFIG.projectId||"default")+"::"+(d.text||"").trim().toLowerCase(); }
 function getStatus(d){ return STATUSES[statusKey(d)]||"open"; }
 function statusCount(status){ return DATA.filter(function(d){ return getStatus(d)===status; }).length; }
-function cycleStatus(id){ var d=DATA.find(function(x){return x.id===id;}); if(!d) return; var cur=getStatus(d), next=cur==="open"?"shortlisted":(cur==="shortlisted"?"done":"open"); if(next==="open") delete STATUSES[statusKey(d)]; else STATUSES[statusKey(d)]=next; saveStatuses(); refresh(); announce("Idea status changed to "+statusLabel(next)+"."); }
+function cycleStatus(id){ var d=DATA.find(function(x){return x.id===id;}); if(!d) return; var cur=getStatus(d), next=cur==="open"?"shortlisted":(cur==="shortlisted"?"action":(cur==="action"?"done":"open")); if(next==="open") delete STATUSES[statusKey(d)]; else STATUSES[statusKey(d)]=next; saveStatuses(); refresh(); announce("Idea status changed to "+statusLabel(next)+"."); }
 function resetStatuses(){ STATUSES={}; saveStatuses(); refresh(); announce("All idea statuses reset to open."); }
-function statusLabel(status){ return status==="shortlisted"?"Shortlisted":(status==="done"?"Done":"Open"); }
+function statusLabel(status){ return status==="shortlisted"?"Shortlisted":(status==="action"?"Action item":(status==="done"?"Done":"Open")); }
 var CAT_COLORS=["#2F6BED","#1FA971","#8B5CF6","#F59E0B","#EC4899","#0EA5E9","#14B8A6","#64748B"];
 
 function loadConfig(){
@@ -483,14 +487,15 @@ function refresh(){
 }
 function renderStats(){
   var el=$("stats"); if(!DATA.length){ el.innerHTML=""; return; }
-  var people={}; DATA.forEach(function(d){ if(d.name) people[d.name.toLowerCase()]=true; });
+  var people={}; DATA.forEach(function(d){ var n=String(d.name||"").trim(); if(n) people[n.toLowerCase()]=true; });
   var feat=DATA.filter(function(d){return d.featured;}).length;
-  var short=statusCount("shortlisted"), done=statusCount("done");
+  var short=statusCount("shortlisted"), action=statusCount("action"), done=statusCount("done");
   el.innerHTML=statChip("💡",DATA.length,DATA.length===1?"idea":"ideas")
     +(Object.keys(people).length?statChip("🙋",Object.keys(people).length,"people"):"")
     +(TEAMS.length?statChip("👥",TEAMS.length,TEAMS.length===1?"team":"teams"):"")
     +(feat?statChip("★",feat,"featured"):"")
     +(short?statChip("◆",short,"shortlisted"):"")
+    +(action?statChip("⚑",action,"action items"):"")
     +(done?statChip("✓",done,"done"):"");
 }
 function statChip(icon,n,label){ return '<div class="stat"><b>'+icon+" "+n+'</b><span>'+esc(label)+'</span></div>'; }
@@ -508,8 +513,8 @@ function renderControls(){
 }
 function lenClass(t){ var n=t.length; return n>220?"vlong":(n>110?"long":""); }
 function featBadge(){ return '<span class="feat">★ Featured</span>'; }
-function statusBadge(d){ var st=getStatus(d); if(st==="open") return ""; return '<span class="status-badge '+st+'">'+(st==="shortlisted"?'◆ Shortlisted':'✓ Done')+'</span>'; }
-function checkBtnHTML(d){ var st=getStatus(d), cls=st==="open"?"":(st==="shortlisted"?" is-shortlisted":" is-done"), next=st==="open"?"Shortlist this idea":(st==="shortlisted"?"Mark as done":"Reset to open"); return '<button class="checkbtn'+cls+'" data-check="'+d.id+'" aria-label="'+next+'" title="'+next+'"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="m5 13 4 4 10-11" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>'; }
+function statusBadge(d){ var st=getStatus(d); if(st==="open") return ""; return '<span class="status-badge '+st+'">'+(st==="shortlisted"?'◆ Shortlisted':(st==="action"?'⚑ Action item':'✓ Done'))+'</span>'; }
+function checkBtnHTML(d){ var st=getStatus(d), cls=st==="open"?"":(st==="shortlisted"?" is-shortlisted":(st==="action"?" is-action":" is-done")), next=st==="open"?"Shortlist this idea":(st==="shortlisted"?"Mark as action item":(st==="action"?"Mark as done":"Reset to open")); return '<button class="checkbtn'+cls+'" data-check="'+d.id+'" aria-label="'+next+'" title="'+next+'"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="m5 13 4 4 10-11" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>'; }
 function statusClass(d){ var st=getStatus(d); return st==="open"?"":" status-"+st; }
 function chipHTML(cat){ return cat?'<span class="chip" style="--chip:'+catColor(cat)+'"><span class="cdot"></span>'+esc(cat)+'</span>':''; }
 function bylineHTML(d){ return '<div class="byline">'+(d.name?esc(d.name):'<span class="anon">Anonymous</span>')+(d.team?'<span class="team-tag">'+esc(d.team)+'</span>':'')+'</div>'; }
