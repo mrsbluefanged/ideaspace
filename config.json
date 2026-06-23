@@ -56,6 +56,14 @@
       "formUrl": "https://docs.google.com/forms/d/e/1FAIpQLSfjPvC2q9DeCMVY0hEyj8tTCROJ5WALyB6wDyfRpRXsqzcejQ/viewform?usp=publish-editor",
       "ideasCsvUrl": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTQy6_YT-8hHfZDI1ZejjJWQRc9M61LlpIIo-KUhFtZj6SxL7iSlKNnWLtvbVmFPuMPQ8AJzbABktZ7/pub?output=csv",
       "refreshSeconds": 30
+    },
+    {
+      "id": "cbo",
+      "name": "Common Back Office",
+      "question": "Common Back Office: What's on your mind?",
+      "formUrl": "https://docs.google.com/forms/d/e/1FAIpQLSfTo8o7Ou8prJhFLr4bqnhuyQHggdXu4vCfRnRt7WoYegD8TQ/viewform?usp=publish-editor",
+      "ideasCsvUrl": "https://docs.google.com/spreadsheets/d/e/2PACX-1vReYwYROriT4d2cu0gdoNh-fy_Cw_6qjrpO1ZLwI_ddUR-WyNaAWefMqQewB_O-n_FaXmy2tCPbXbX4/pub?output=csv",
+      "refreshSeconds": 30
     }
   ]
 }
