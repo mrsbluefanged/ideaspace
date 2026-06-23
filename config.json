@@ -58,7 +58,7 @@
       "refreshSeconds": 30
     },
     {
-      "id": "cbo",
+      "id": "cb",
       "name": "Common Back Office",
       "question": "Common Back Office: What's on your mind?",
       "formUrl": "https://docs.google.com/forms/d/e/1FAIpQLSfTo8o7Ou8prJhFLr4bqnhuyQHggdXu4vCfRnRt7WoYegD8TQ/viewform?usp=publish-editor",
