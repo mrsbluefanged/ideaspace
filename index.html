@@ -27,7 +27,7 @@
   Category  : category | tag | theme | type
   Featured  : featured | star | highlight | pin
               Put y in this column to feature a card. Featured cards
-              get a badge and rise to the top under "Featured first".
+              get a badge and appear under "Featured only".
 
   Categories and Teams are read straight from the file. Whatever is
   in those columns becomes the filters and the card colours.
@@ -61,7 +61,10 @@ h1,h2,h3,.display{font-family:"Nunito",system-ui,sans-serif}
 .iconbtn{border:1px solid var(--line);background:var(--surface);color:var(--ink-soft);width:44px;height:44px;border-radius:13px;display:grid;place-items:center;cursor:pointer;transition:transform .12s ease, background .12s ease}
 .iconbtn:hover{background:#fff;color:var(--ink)}
 .iconbtn:active{transform:scale(.94)}
-.topbar-actions{display:flex;gap:8px}
+.topbar-actions{display:flex;gap:8px;align-items:center}
+.top-submit{border:1px solid color-mix(in srgb,var(--primary) 35%,#fff);background:linear-gradient(160deg,var(--primary),var(--primary-press));color:#fff;border-radius:13px;padding:0 16px;height:44px;font:inherit;font-family:"Nunito",sans-serif;font-weight:800;cursor:pointer;box-shadow:0 10px 20px -12px var(--primary);display:flex;align-items:center;justify-content:center;gap:8px;white-space:nowrap;transition:transform .12s ease}
+.top-submit:active{transform:scale(.96)}
+.top-submit svg{flex:0 0 auto}
 
 .question{font-family:"Nunito",sans-serif;font-weight:800;line-height:1.16;font-size:1.72rem;letter-spacing:-.02em;margin:6px 2px 4px;max-width:900px}
 .question .lead{display:block;font-size:.74rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--spark-deep);margin-bottom:6px}
@@ -89,10 +92,10 @@ h1,h2,h3,.display{font-family:"Nunito",system-ui,sans-serif}
 
 /* cards (swipe) */
 .deck{flex:1;display:flex;flex-direction:column;justify-content:center;min-height:380px;margin:8px 0 4px;align-self:center;width:100%;max-width:560px}
-.deck-stage{position:relative;flex:1;min-height:340px}
+.deck-stage{position:relative;flex:1;min-height:340px;overflow:hidden}
 .stack-bg{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:94%;height:90%;border-radius:var(--radius-card);background:var(--surface);border:1px solid var(--line);opacity:.6}
 .stack-bg.b2{width:88%;height:84%;opacity:.35}
-.card{position:absolute;inset:0;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-card);box-shadow:var(--shadow-card);padding:22px 22px 18px;display:flex;flex-direction:column;will-change:transform,opacity;touch-action:pan-y}
+.card{position:absolute;inset:0;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-card);box-shadow:var(--shadow-card);padding:22px 22px 18px;display:flex;flex-direction:column;will-change:transform,opacity;touch-action:pan-y;min-height:0;overflow:hidden}
 .card-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px;min-height:30px}
 .ct-tags{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .checkbtn{flex:0 0 auto;width:34px;height:34px;border-radius:10px;border:1px solid var(--line);background:#fff;color:var(--ink-faint);display:grid;place-items:center;cursor:pointer;transition:background .12s ease,color .12s ease,border-color .12s ease,transform .12s ease}
@@ -108,7 +111,7 @@ h1,h2,h3,.display{font-family:"Nunito",system-ui,sans-serif}
 .card.status-done,.bitem.status-done,.bento-big.status-done,.bento-small.status-done{opacity:.7}
 .bitem.status-shortlisted,.bento-big.status-shortlisted,.bento-small.status-shortlisted,.card.status-shortlisted{border-color:color-mix(in srgb,#8B5CF6 35%,#fff)}
 .bitem.status-action,.bento-big.status-action,.bento-small.status-action,.card.status-action{border-color:color-mix(in srgb,#F59E0B 45%,#fff)}
-.idea-text{font-family:"Nunito",sans-serif;font-weight:800;letter-spacing:-.01em;font-size:1.5rem;line-height:1.28;margin:10px 0;flex:1;display:flex;align-items:center;overflow:auto}
+.idea-text{font-family:"Nunito",sans-serif;font-weight:800;letter-spacing:-.01em;font-size:1.5rem;line-height:1.28;margin:10px 0;flex:1;min-height:0;max-height:100%;display:block;align-items:flex-start;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding-right:4px}
 .idea-text.long{font-size:1.18rem}
 .idea-text.vlong{font-size:1rem;align-items:flex-start}
 .byline{color:var(--ink-soft);font-weight:600;font-size:.92rem;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
@@ -192,6 +195,7 @@ h1,h2,h3,.display{font-family:"Nunito",system-ui,sans-serif}
   .bento-big{grid-column:1 / -1;grid-row:auto}
   .bento-big .big-text{font-size:1.6rem}
 }
+@media (max-width:520px){ .top-submit{width:44px;padding:0;font-size:0} .top-submit span{display:none} .top-submit svg{margin:0} }
 @media (max-width:380px){ .question{font-size:1.42rem} .idea-text{font-size:1.32rem} }
 @media (prefers-reduced-motion:reduce){ *{transition:none !important;animation:none !important} }
 </style>
@@ -208,6 +212,7 @@ h1,h2,h3,.display{font-family:"Nunito",system-ui,sans-serif}
       Ideaspace
     </div>
     <div class="topbar-actions">
+      <button class="top-submit" id="topSubmitBtn" aria-label="Submit an idea"><svg width="19" height="19" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg><span>Submit</span></button>
       <button class="iconbtn" id="textBtn" aria-label="Text size"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M4 19 9 6l5 13M5.6 15h6.8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M15 19l3-8 3 8M16.2 16.6h3.6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
       <button class="iconbtn" id="gearBtn" aria-label="Organizer settings"><svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" stroke="currentColor" stroke-width="1.8"/><path d="M19.4 13a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-2.9 1.2V21a2 2 0 1 1-4 0v-.1A1.7 1.7 0 0 0 7 19.4a1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1A1.7 1.7 0 0 0 2.6 14H2.5a2 2 0 1 1 0-4h.1A1.7 1.7 0 0 0 4.6 7a1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1A1.7 1.7 0 0 0 10 2.6h0A1.7 1.7 0 0 0 11 1h2a2 2 0 0 1 .3 4 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1A1.7 1.7 0 0 0 21.4 10h.1a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.6 1Z" stroke="currentColor" stroke-width="1.5"/></svg></button>
     </div>
@@ -221,7 +226,7 @@ h1,h2,h3,.display{font-family:"Nunito",system-ui,sans-serif}
     <div class="select">
       <select id="sortSel" aria-label="Sort ideas">
         <option value="newest">All entries</option>
-        <option value="featured">Featured first</option>
+        <option value="featured">Featured only</option>
         <option value="random">Surprise me</option>
       </select>
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -435,7 +440,24 @@ function normalizeRows(rows){
   });
   return out;
 }
-function setData(rows,label){ DATA=normalizeRows(rows); computeFacets(); idx=0; refresh(); announce(DATA.length+" ideas loaded"+(label?" from "+label:"")); }
+function dataSignature(rows){ try{ return JSON.stringify(rows.map(function(d){ return [d.id,d.text,d.name,d.team,d.category,d.featured]; })); }catch(e){ return String(Date.now()); } }
+var lastDataSignature="";
+function setData(rows,label,opts){
+  opts=opts||{};
+  var normalized=normalizeRows(rows);
+  var sig=dataSignature(normalized);
+  if(opts.skipIfSame && sig===lastDataSignature) return;
+  var previousText=view[idx]&&view[idx].text;
+  DATA=normalized;
+  lastDataSignature=sig;
+  computeFacets();
+  if(opts.preservePosition && previousText){
+    var nextIndex=DATA.findIndex(function(d){ return d.text===previousText; });
+    idx=nextIndex>=0?nextIndex:Math.min(idx,Math.max(DATA.length-1,0));
+  } else { idx=0; }
+  refresh();
+  if(!opts.silent) announce(DATA.length+" ideas loaded"+(label?" from "+label:""));
+}
 function parseCSV(text){
   var rows=[],row=[],field="",i=0,inq=false,c;
   function pf(){ row.push(field); field=""; } function pr(){ pf(); rows.push(row); row=[]; }
@@ -468,10 +490,11 @@ function buildView(){
     var okC = cat==="all"||String(d.category).toLowerCase()===cat.toLowerCase();
     var okT = team==="all"||String(d.team).toLowerCase()===team.toLowerCase();
     var okS = status==="all"||getStatus(d)===status;
-    return okC&&okT&&okS;
+    var okF = sort!=="featured"||d.featured;
+    return okC&&okT&&okS&&okF;
   });
   if(sort==="random"){ view.sort(function(){ return Math.random()-.5; }); }
-  else { view.reverse(); if(sort==="featured") view.sort(function(a,b){ return (b.featured?1:0)-(a.featured?1:0); }); }
+  else { view.reverse(); }
   if(idx>=view.length) idx=0;
 }
 
@@ -479,7 +502,7 @@ function buildView(){
 function refresh(){
   buildView(); renderStats(); renderControls();
   var has=DATA.length>0, m=CONFIG.viewMode;
-  $("empty").hidden=has; $("controls").hidden=!has; $("viewToggle").hidden=!has; $("shareBtn").hidden=!has;
+  $("empty").hidden=has; $("controls").hidden=!has; $("viewToggle").hidden=!has; $("shareBtn").hidden=!has; if($("topSubmitBtn")) $("topSubmitBtn").hidden=false;
   $("deck").hidden=!has||m!=="cards";
   $("board").hidden=!has||(m!=="list"&&m!=="grid");
   $("present").hidden=!has||m!=="present";
@@ -607,6 +630,11 @@ function sampleData(){ return [
   {Idea:"Rotate who facilitates team check-ins so it is not always the same person.",Name:"Leo",Team:"People & Culture",Category:"Teamwork",Featured:""}
 ]; }
 
+function openSubmitForm(){
+  if(CONFIG.formUrl){ window.open(CONFIG.formUrl,"_blank","noopener"); }
+  else { openSheet("setScrim","setSheet"); announce("Add a form link so participants can submit ideas."); }
+}
+
 /* ---------- init ---------- */
 function init(){
   applySize(CONFIG.size); setView(CONFIG.viewMode); $("qText").textContent=CONFIG.question;
@@ -617,7 +645,8 @@ function init(){
   $("prevBtn").onclick=function(){ go(-1); };
   $("nextBtn").onclick=function(){ go(1); };
   Array.prototype.forEach.call($("viewToggle").children,function(b){ b.onclick=function(){ setView(b.dataset.mode); }; });
-  $("shareBtn").onclick=function(){ if(CONFIG.formUrl){ window.open(CONFIG.formUrl,"_blank","noopener"); } else { openSheet("setScrim","setSheet"); announce("Add a form link so participants can share ideas."); } };
+  $("shareBtn").onclick=openSubmitForm;
+  if($("topSubmitBtn")) $("topSubmitBtn").onclick=openSubmitForm;
 
   var fi=$("fileInput"); function pick(){ fi.value=""; fi.click(); }
   $("loadBtn").onclick=pick; $("loadBtn2").onclick=pick;
@@ -680,14 +709,26 @@ function loadConfigFile(done){
     })
     .catch(function(){}).then(done);
 }
+var isFetchingIdeas=false;
 function fetchIdeas(){
+  if(isFetchingIdeas) return;
+  isFetchingIdeas=true;
   var url=(CONFIG.ideasCsvUrl||"").trim();
   if(url){
     fetch(url,{cache:"no-store"}).then(function(r){ if(!r.ok) throw 0; return r.text(); })
-      .then(function(t){ setData(parseCSV(t),"Google Sheet"); })
-      .catch(function(){ fetchLocalIdeas(); announce("Could not load Google Sheet. Showing local ideas file if available."); });
+      .then(function(t){
+        var rows=parseCSV(t);
+        if(!rows.length) throw 0;
+        setData(rows,"Google Sheet",{preservePosition:true,skipIfSame:true,silent:DATA.length>0});
+      })
+      .catch(function(){
+        if(!DATA.length){ fetchLocalIdeas(); }
+        else { announce("Refresh paused. Keeping current ideas on screen."); }
+      })
+      .then(function(){ isFetchingIdeas=false; });
   } else {
     fetchLocalIdeas();
+    isFetchingIdeas=false;
   }
 }
 function fetchLocalIdeas(){
