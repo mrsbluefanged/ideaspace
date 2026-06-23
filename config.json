@@ -64,6 +64,14 @@
       "formUrl": "https://docs.google.com/forms/d/e/1FAIpQLSfTo8o7Ou8prJhFLr4bqnhuyQHggdXu4vCfRnRt7WoYegD8TQ/viewform?usp=publish-editor",
       "ideasCsvUrl": "https://docs.google.com/spreadsheets/d/e/2PACX-1vReYwYROriT4d2cu0gdoNh-fy_Cw_6qjrpO1ZLwI_ddUR-WyNaAWefMqQewB_O-n_FaXmy2tCPbXbX4/pub?output=csv",
       "refreshSeconds": 30
+    }, 
+    {
+      "id": "ee1",
+      "name": "Efficiency & Effectiveness",
+      "question": "Efficiency & Effectiveness: What's on your mind?",
+      "formUrl": "https://docs.google.com/forms/d/e/1FAIpQLSeB2zrIp0b1brlVghVxucJpNRpxL_LHho3D6f2dxdaBFwFnVw/viewform?usp=publish-editor",
+      "ideasCsvUrl": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTduiP2hTRAfk5P2vEvLUnqqAjjpQqVxPVCHkUrDjZZPTD3haIeDOGbb0wpSMHGgEWVhfbYu6hOc9sW/pub?output=csv",
+      "refreshSeconds": 30
     }
   ]
 }
