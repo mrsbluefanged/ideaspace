@@ -1,86 +1,18 @@
 {
-  "defaultProject": "s1",
-  "projects": [
-    {
-      "id": "MF",
-      "name": "MTR Feedback: What's on your mind?",
-      "question": "MTR Feedback",
-      "formUrl": "https://forms.gle/7JTXjZRnkW78pP4z7",
-      "ideasCsvUrl": "https://docs.google.com/spreadsheets/d/e/2PACX-1vSh-S9rsiyUW1up-_0XzwqUej6vV8-uHl_bXDSyUiXJpVeyyKAapeD7MjnFWdLnh1DRmiIl54sbJ3xa/pub?output=csv",
-      "refreshSeconds": 30
-    },
-
-    {
-      "id": "RM",
-      "name": "RM",
-      "question": "Resource Mobilization: What's on your mind?​",
-      "formUrl": "https://docs.google.com/forms/d/e/1FAIpQLSdhQjaBN2IqONjBpmLyOi6Q39VxIYc-uQ2ArgASAMmxGu9G1A/viewform?fbzx=5781501051050625629",
-      "ideasCsvUrl": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRVJKAaduPFwok5P-Jh6Tmvzr2Tuh6vEaaWweqgGasrqcw_hgrAUxZxUvkzpDpnRA6QWxZR6Mh0ijzx/pub?output=csv",
-      "refreshSeconds": 30
-    },
-     {
-      "id": "R1",
-      "name": "R1",
-      "question": "Resource Mobilization: What are your 3 commitments to help achieve our office’s fundraising targets?​",
-      "formUrl": "https://docs.google.com/forms/d/e/1FAIpQLSeLqr1qzA2mIDXOCjJTNJ2xWCY2JnMTqXHr4tYXBAZavE2p_w/viewform?usp=publish-editor",
-      "ideasCsvUrl": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRVUUfaTinkG51AcWEn63lNKscWEvYHlnNcOBKfbE9poo1OgvMR4xr4VPwaOBKnxjR-JLcNNRLUrfJc/pub?output=csv",
-      "refreshSeconds": 30
-    },
-    {
-      "id": "EE",
-      "name": "Efficiency and Effectiveness: What could help us improve?",
-      "question": "What type of actions we could take to be more efficient?",
-      "formUrl": "https://forms.gle/EQqs5pnjWtAcLyA26",
-      "ideasCsvUrl": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTcgnyph1FVLWZVyA3nf9PHyyqgcHx-FfC2oh8HEm5fsnRDtLNLC31aiV3mx4DApv0eacxykMxkOeAG/pub?output=csv",
-      "refreshSeconds": 30
-    },
-    {
-      "id": "op",
-      "name": "Oversight and risk management",
-      "question": "Oversight and risk management: What's on your mid?",
-      "formUrl": "https://forms.gle/oKDK964bsovgAQWF7",
-      "ideasCsvUrl": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRKKSNnYohMOk2VxrGDlRCpR6yuuCCDI4LZnzFuC85LeNUSrturA4-B2sDUNWjgwjG-NAUwUOyubROz/pub?output=csv",
-      "refreshSeconds": 30
-    },
-    {
-      "id": "stn",
-      "name": "Progress in advancing children’s rights & evolving landscape",
-      "question": "What do these trends mean for the rest of CPC9, and how should we adapt to maintain momentum and sustain results for children?",
-      "formUrl": "https://docs.google.com/forms/d/e/1FAIpQLSfCqe3WGF2_MyuibnohrGZGDBeASJhX-7oIecyVABl_xPWk5g/viewform?usp=header",
-      "ideasCsvUrl": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRcbFWUND0NHdDkG6WEC0VmSs7ZqrC210gJy2U6uW-qQPgN2iemMziirocNK1Xfr_b5ojVHxbakwwqK/pub?output=csv",
-      "refreshSeconds": 30
-    },
-      {
-      "id": "prg",
-      "name": "From Shifts to Results: Taking Stock, Learning, and Accelerating Progress ",
-      "question": "From Shifts to Results: What's on your mind?",
-      "formUrl": "https://docs.google.com/forms/d/e/1FAIpQLSfdjuD1FO5VfpHB8mxneCsya0400Jo5k5FablkBF-q7ls6bNw/viewform?usp=publish-editor",
-      "ideasCsvUrl": "https://docs.google.com/spreadsheets/d/e/2PACX-1vQhLbX24cAVR9sLctsnYn0afMGkBKqbD8jQFo2YOGTEspbTpElqL2nyI-CqoYFD9ybojq_h0eLH21SL/pub?output=csv",
-      "refreshSeconds": 30
-    },
-      {
-      "id": "pc",
-      "name": "Office culture and staff welfare ",
-      "question": "Office culture and staff welfare: What's on your mind?",
-      "formUrl": "https://docs.google.com/forms/d/e/1FAIpQLSfjPvC2q9DeCMVY0hEyj8tTCROJ5WALyB6wDyfRpRXsqzcejQ/viewform?usp=publish-editor",
-      "ideasCsvUrl": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTQy6_YT-8hHfZDI1ZejjJWQRc9M61LlpIIo-KUhFtZj6SxL7iSlKNnWLtvbVmFPuMPQ8AJzbABktZ7/pub?output=csv",
-      "refreshSeconds": 30
-    },
-    {
-      "id": "bz",
-      "name": "Behzad",
-      "question": "What’s your fondest memory or message for Behzad?",
-      "formUrl": "https://docs.google.com/forms/d/e/1FAIpQLSdqiAq48jtc9C1M4bU1G0_RRN-mvrxWWSly3se5173YIshPpA/viewform?usp=publish-editor",
-      "ideasCsvUrl": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTs4ayoTBLG8N_xx-IqgLeGePrhlM9juoSY4d00uHXM7RxRmOBPZVQSqs1PkMJgmc-vHIJgiSgFqLce/pub?output=csv",
-      "refreshSeconds": 30
-    }, 
-    {
-      "id": "e1",
-      "name": "Efficiency & Effectiveness",
-      "question": "Efficiency & Effectiveness: What's on your mind?",
-      "formUrl": "https://docs.google.com/forms/d/e/1FAIpQLSeB2zrIp0b1brlVghVxucJpNRpxL_LHho3D6f2dxdaBFwFnVw/viewform?usp=publish-editor",
-      "ideasCsvUrl": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTduiP2hTRAfk5P2vEvLUnqqAjjpQqVxPVCHkUrDjZZPTD3haIeDOGbb0wpSMHGgEWVhfbYu6hOc9sW/pub?output=csv",
-      "refreshSeconds": 30
-    }  
-  ]
+  "question": "What is your idea to help our office improve?",
+  "formUrl": "https://forms.google.com/YOUR-FORM-LINK",
+  "ideasCsvUrl": "https://docs.google.com/spreadsheets/d/e/YOUR-PUBLISHED-SHEET/pub?output=csv",
+  "refreshSeconds": 30,
+  "boardGroupBy": "category",
+  "selectedQuestion": ""
 }
+
+{
+  "question": "What is your idea to help our office improve?",
+  "formUrl": "https://forms.google.com/YOUR-FORM-LINK",
+  "ideasCsvUrl": "https://docs.google.com/spreadsheets/d/e/YOUR-PUBLISHED-SHEET/pub?output=csv",
+  "refreshSeconds": 30,
+  "boardGroupBy": "category",
+  "selectedQuestion": ""
+}
+
