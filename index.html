@@ -26,7 +26,8 @@
   Team      : team | group | department | unit | office
   Category  : category | tag | theme | type
   Subcategory: subcategory | sub category | sub-category | subtheme | sub-theme
-  Question  : question | prompt | discussion question
+  QuestionID: questionid | question id | question_id       (recommended for multi-question setups)
+  Question  : question | prompt | discussion question       (legacy/full-text fallback)
   Featured  : featured | star | highlight | pin
               Put y in this column to feature a card. Featured cards
               get a badge and rise to the top under "Featured first".
@@ -430,7 +431,7 @@ h1,h2,h3,.display{font-family:"Nunito",system-ui,sans-serif}
   <div class="field">
     <label for="qInput">Question</label>
     <input id="qInput" type="text" placeholder="What is your idea to improve efficiency?" />
-    <p class="hint">Changes this device only. For all devices, use config.json.</p>
+    <p class="hint">Fallback question only. For multiple questions, use the questions list in config.json.</p>
   </div>
   <div class="field">
     <label for="formInput">"Share my idea" form link</label>
@@ -481,8 +482,8 @@ h1,h2,h3,.display{font-family:"Nunito",system-ui,sans-serif}
 var STORE="ideaspace_v2";
 var ORGANIZER_PIN="2468";
 var CONFIG=loadConfig();
-var DATA=[];            // [{id,text,name,team,category,subcategory,question,featured}]
-var CATS=[], SUBCATS=[], TEAMS=[], QUESTIONS=[];
+var DATA=[];            // [{id,text,name,team,category,subcategory,questionId,question,featured}]
+var CATS=[], SUBCATS=[], TEAMS=[], QUESTIONS=[]; // [{id,label}]
 var view=[], idx=0;
 var deployedConfig=false;
 var STATUSES=loadStatuses();
@@ -508,10 +509,11 @@ function loadConfig(){
       size:c.size||"17",
       viewMode:c.viewMode||"cards",
       boardGroupBy:c.boardGroupBy||"category",
-      selectedQuestion:c.selectedQuestion||""
+      selectedQuestion:c.selectedQuestion||"",
+      questions:Array.isArray(c.questions)?c.questions:[]
     };
   }catch(e){
-    return {question:"What is your idea to help our office improve?",formUrl:"",ideasCsvUrl:"",refreshSeconds:"30",projectId:"default",projectName:"",size:"17",viewMode:"cards",boardGroupBy:"category",selectedQuestion:""};
+    return {question:"What is your idea to help our office improve?",formUrl:"",ideasCsvUrl:"",refreshSeconds:"30",projectId:"default",projectName:"",size:"17",viewMode:"cards",boardGroupBy:"category",selectedQuestion:"",questions:[]};
   }
 }
 function saveConfig(){ localStorage.setItem(STORE+"_cfg",JSON.stringify(CONFIG)); }
@@ -520,14 +522,50 @@ function $(id){ return document.getElementById(id); }
 function esc(s){ return String(s==null?"":s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];}); }
 function rid(){ return "ix"+Math.random().toString(36).slice(2,9); }
 
+function normalizeQuestions(list){
+  var out=[], seen={};
+  (Array.isArray(list)?list:[]).forEach(function(q,i){
+    if(typeof q==="string") q={id:"q"+(i+1),label:q};
+    if(!q) return;
+    var id=String(q.id||("q"+(i+1))).trim();
+    var label=String(q.label||q.question||q.title||id).trim();
+    if(!id||!label||seen[id.toLowerCase()]) return;
+    seen[id.toLowerCase()]=1; out.push({id:id,label:label});
+  });
+  return out;
+}
+function questionById(id){
+  var key=String(id||"").toLowerCase();
+  return QUESTIONS.find(function(q){return q.id.toLowerCase()===key;})||null;
+}
+function questionIdFromLabel(label){
+  var key=String(label||"").trim().toLowerCase();
+  var q=QUESTIONS.find(function(x){return x.label.toLowerCase()===key;});
+  return q?q.id:"";
+}
+function rowQuestionId(d){
+  if(d.questionId) return String(d.questionId).trim();
+  var mapped=questionIdFromLabel(d.question);
+  return mapped || String(d.question||"").trim();
+}
+function questionLabel(id){
+  if(id==="all") return "All questions";
+  var q=questionById(id); return q?q.label:String(id||CONFIG.question||"");
+}
 function computeFacets(){
-  CATS=[]; SUBCATS=[]; TEAMS=[]; QUESTIONS=[]; var sc={}, ss={}, st={}, sq={};
+  CATS=[]; SUBCATS=[]; TEAMS=[]; var sc={}, ss={}, st={};
   DATA.forEach(function(d){
     if(d.category){ var k=String(d.category).trim(),lk=k.toLowerCase(); if(k&&!sc[lk]){ sc[lk]=1; CATS.push(k); } }
     if(d.subcategory){ var sk=String(d.subcategory).trim(),sl=sk.toLowerCase(); if(sk&&!ss[sl]){ ss[sl]=1; SUBCATS.push(sk); } }
     if(d.team){ var t=String(d.team).trim(),lt=t.toLowerCase(); if(t&&!st[lt]){ st[lt]=1; TEAMS.push(t); } }
-    if(d.question){ var q=String(d.question).trim(),lq=q.toLowerCase(); if(q&&!sq[lq]){ sq[lq]=1; QUESTIONS.push(q); } }
   });
+  QUESTIONS=normalizeQuestions(CONFIG.questions);
+  if(!QUESTIONS.length){
+    var sq={}; DATA.forEach(function(d){
+      var legacy=String(d.question||"").trim(), lk=legacy.toLowerCase();
+      if(legacy&&!sq[lk]){sq[lk]=1; QUESTIONS.push({id:legacy,label:legacy});}
+    });
+  }
 }
 function catColor(cat){ if(!cat) return "#64748B"; var i=CATS.findIndex(function(c){return c.toLowerCase()===String(cat).toLowerCase();}); return CAT_COLORS[(i<0?CAT_COLORS.length-1:i)%CAT_COLORS.length]; }
 function subcatColor(subcat){ if(!subcat) return "#64748B"; var i=SUBCATS.findIndex(function(c){return c.toLowerCase()===String(subcat).toLowerCase();}); return CAT_COLORS[(i<0?CAT_COLORS.length-1:i)%CAT_COLORS.length]; }
@@ -549,6 +587,7 @@ function normalizeRows(rows){
       team:pick(["team","group","department","unit","office","section"]),
       category:pick(["category","tag","theme","type"]),
       subcategory:pick(["subcategory","sub category","sub-category","subtheme","sub theme","sub-theme","sub category/tag","sub-category/tag"]),
+      questionId:pick(["questionid","question id","question_id","question key","questionkey"]),
       question:pick(["question","prompt","discussion question","question / prompt","question/prompt"]),
       featured:truthy(pick(["featured","feature","star","highlight","pin","spotlight"]))
     });
@@ -559,8 +598,8 @@ function setData(rows,label){
   DATA=normalizeRows(rows); computeFacets();
   if(QUESTIONS.length){
     var current=String(CONFIG.selectedQuestion||"");
-    var valid=current==="all"||QUESTIONS.some(function(q){return q.toLowerCase()===current.toLowerCase();});
-    if(!valid) CONFIG.selectedQuestion=QUESTIONS[0];
+    var valid=current==="all"||!!questionById(current);
+    if(!valid) CONFIG.selectedQuestion=QUESTIONS[0].id;
   } else CONFIG.selectedQuestion="";
   idx=0; syncQuestionUI(); refresh(); announce(DATA.length+" ideas loaded"+(label?" from "+label:""));
 }
@@ -594,7 +633,7 @@ function buildView(){
   var cat=$("catSel").value, subcat=$("subcatSel")?$("subcatSel").value:"all", team=$("teamSel").value, sort=$("sortSel").value, status=$("statusSel")?$("statusSel").value:"all";
   var selectedQ=String(CONFIG.selectedQuestion||"");
   view=DATA.filter(function(d){
-    var okQ = !selectedQ||selectedQ==="all"||String(d.question||"").toLowerCase()===selectedQ.toLowerCase();
+    var okQ = !selectedQ||selectedQ==="all"||rowQuestionId(d).toLowerCase()===selectedQ.toLowerCase();
     var okC = cat==="all"||String(d.category).toLowerCase()===cat.toLowerCase();
     var okSC = subcat==="all"||String(d.subcategory||"").toLowerCase()===subcat.toLowerCase();
     var okT = team==="all"||String(d.team).toLowerCase()===team.toLowerCase();
@@ -627,7 +666,7 @@ function refresh(){
 function questionScopedData(){
   var q=String(CONFIG.selectedQuestion||"");
   if(!q||q==="all") return DATA.slice();
-  return DATA.filter(function(d){return String(d.question||"").toLowerCase()===q.toLowerCase();});
+  return DATA.filter(function(d){return rowQuestionId(d).toLowerCase()===q.toLowerCase();});
 }
 function renderStats(){
   var el=$("stats"), base=questionScopedData(); if(!DATA.length){ el.innerHTML=""; return; }
@@ -699,7 +738,7 @@ function renderBoard(){
 function availableProjectFields(){
   var fields=[];
   if(DATA.some(function(d){return d.category;})) fields.push({key:"category",label:"Category"});
-  if((!CONFIG.selectedQuestion||CONFIG.selectedQuestion==="all") && DATA.some(function(d){return d.question;})) fields.push({key:"question",label:"Question"});
+  if((!CONFIG.selectedQuestion||CONFIG.selectedQuestion==="all") && (QUESTIONS.length||DATA.some(function(d){return d.question||d.questionId;}))) fields.push({key:"question",label:"Question"});
   if(DATA.some(function(d){return d.subcategory;})) fields.push({key:"subcategory",label:"Subcategory"});
   if(DATA.some(function(d){return d.team;})) fields.push({key:"team",label:"Team"});
   if(!fields.length) fields.push({key:"none",label:"All ideas"});
@@ -713,6 +752,7 @@ function renderProjectControl(){
 }
 function projectGroupValue(d,key){
   if(key==="none") return "Ideas";
+  if(key==="question") return questionLabel(rowQuestionId(d))||"Other";
   var v=String(d[key]||"").trim();
   return v||"Other";
 }
@@ -757,9 +797,9 @@ function syncQuestionUI(){
   var btn=$("questionMenuBtn"), list=$("questionList");
   btn.hidden=QUESTIONS.length<2;
   if(!QUESTIONS.length){ $("qText").textContent=CONFIG.question; list.innerHTML=""; return; }
-  if(!CONFIG.selectedQuestion) CONFIG.selectedQuestion=QUESTIONS[0];
-  $("qText").textContent=CONFIG.selectedQuestion==="all"?"All questions":CONFIG.selectedQuestion;
-  var html=QUESTIONS.map(function(q){return questionMenuItem(q,q);}).join("");
+  if(!CONFIG.selectedQuestion||(!questionById(CONFIG.selectedQuestion)&&CONFIG.selectedQuestion!=="all")) CONFIG.selectedQuestion=QUESTIONS[0].id;
+  $("qText").textContent=questionLabel(CONFIG.selectedQuestion);
+  var html=QUESTIONS.map(function(q){return questionMenuItem(q.id,q.label);}).join("");
   if(QUESTIONS.length>1) html+='<div class="qdrawer-divider"></div>'+questionMenuItem("all","All questions")+'<div class="qdrawer-note">Switching questions filters every Ideaspace view.</div>';
   list.innerHTML=html;
 }
@@ -767,7 +807,7 @@ function selectQuestion(q){
   CONFIG.selectedQuestion=q; saveConfig(); idx=0;
   $("catSel").value="all"; if($("subcatSel")) $("subcatSel").value="all"; $("teamSel").value="all";
   syncQuestionUI(); closeQuestionDrawer(); refresh();
-  announce(q==="all"?"Showing all questions.":"Showing question: "+q);
+  announce(q==="all"?"Showing all questions.":"Showing question: "+questionLabel(q));
 }
 
 function bentoCardHTML(d,big){
@@ -815,11 +855,16 @@ function announce(msg){ $("live").textContent=msg; }
 
 /* ---------- export ---------- */
 function exportResults(){
-  var hasSub=DATA.some(function(d){ return d.subcategory; }), hasQuestion=DATA.some(function(d){ return d.question; });
-  var rows=DATA.map(function(d){ var r={Idea:d.text,Name:d.name||"",Team:d.team||"",Category:d.category||""}; if(hasSub) r.Subcategory=d.subcategory||""; if(hasQuestion) r.Question=d.question||""; r.Featured=d.featured?"y":""; return r; });
+  var hasSub=DATA.some(function(d){ return d.subcategory; }), hasQuestion=QUESTIONS.length||DATA.some(function(d){ return d.question||d.questionId; });
+  var rows=DATA.map(function(d){
+    var r={Idea:d.text,Name:d.name||"",Team:d.team||"",Category:d.category||""};
+    if(hasSub) r.Subcategory=d.subcategory||"";
+    if(hasQuestion) r.QuestionID=rowQuestionId(d)||"";
+    r.Featured=d.featured?"y":""; return r;
+  });
   loadSheetJS(function(ok){
     if(ok){ var ws=XLSX.utils.json_to_sheet(rows),wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,"Ideas"); XLSX.writeFile(wb,"ideaspace-ideas.xlsx"); }
-    else { var head=["Idea","Name","Team","Category"]; if(hasSub) head.push("Subcategory"); if(hasQuestion) head.push("Question"); head.push("Featured");
+    else { var head=["Idea","Name","Team","Category"]; if(hasSub) head.push("Subcategory"); if(hasQuestion) head.push("QuestionID"); head.push("Featured");
       var csv=[head.join(",")].concat(rows.map(function(r){ return head.map(function(h){ var v=String(r[h]==null?"":r[h]); return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v; }).join(","); })).join("\n");
       var a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"})); a.download="ideaspace-ideas.csv"; a.click(); }
   });
@@ -833,17 +878,19 @@ function applySize(px){ document.documentElement.style.setProperty("--root",px+"
 function setView(mode){ CONFIG.viewMode=mode; saveConfig(); Array.prototype.forEach.call($("viewToggle").children,function(b){ b.setAttribute("aria-pressed",b.dataset.mode===mode?"true":"false"); }); idx=0; refresh(); }
 
 function sampleData(){ return [
-  {Idea:"Move the weekly status update to a shared dashboard so we stop sitting through read-outs.",Name:"Mara",Team:"Operations",Category:"Efficiency",Subcategory:"Meetings",Question:"What should we improve?",Featured:"y"},
-  {Idea:"A monthly skills swap where staff teach each other one practical thing.",Name:"",Team:"People & Culture",Category:"Teamwork",Question:"What should we start?",Featured:""},
-  {Idea:"Pre-fill recurring travel forms so field colleagues are not re-typing the same details.",Name:"Jun",Team:"Field Support",Category:"Service",Subcategory:"Forms",Question:"What should we improve?",Featured:"y"},
-  {Idea:"Try a no-meeting Friday morning for focused work.",Name:"Aisha",Team:"Operations",Category:"Efficiency",Question:"What should we try?",Featured:""},
-  {Idea:"One shared glossary for our acronyms so new joiners are not lost in week one.",Name:"",Team:"Communications",Category:"Innovation",Question:"What should we start?",Featured:""},
-  {Idea:"Rotate who facilitates team check-ins so it is not always the same person.",Name:"Leo",Team:"People & Culture",Category:"Teamwork",Question:"What should we try?",Featured:""}
+  {Idea:"Move the weekly status update to a shared dashboard so we stop sitting through read-outs.",Name:"Mara",Team:"Operations",Category:"Efficiency",Subcategory:"Meetings",QuestionID:"q1",Featured:"y"},
+  {Idea:"A monthly skills swap where staff teach each other one practical thing.",Name:"",Team:"People & Culture",Category:"Teamwork",QuestionID:"q2",Featured:""},
+  {Idea:"Pre-fill recurring travel forms so field colleagues are not re-typing the same details.",Name:"Jun",Team:"Field Support",Category:"Service",Subcategory:"Forms",QuestionID:"q1",Featured:"y"},
+  {Idea:"Try a no-meeting Friday morning for focused work.",Name:"Aisha",Team:"Operations",Category:"Efficiency",QuestionID:"q3",Featured:""},
+  {Idea:"One shared glossary for our acronyms so new joiners are not lost in week one.",Name:"",Team:"Communications",Category:"Innovation",QuestionID:"q2",Featured:""},
+  {Idea:"Rotate who facilitates team check-ins so it is not always the same person.",Name:"Leo",Team:"People & Culture",Category:"Teamwork",QuestionID:"q3",Featured:""}
 ]; }
 
 /* ---------- init ---------- */
 function init(){
-  applySize(CONFIG.size); setView(CONFIG.viewMode); $("qText").textContent=CONFIG.question;
+  QUESTIONS=normalizeQuestions(CONFIG.questions);
+  if(QUESTIONS.length && !questionById(CONFIG.selectedQuestion)) CONFIG.selectedQuestion=QUESTIONS[0].id;
+  applySize(CONFIG.size); setView(CONFIG.viewMode); syncQuestionUI();
   $("questionMenuBtn").onclick=openQuestionDrawer; $("questionClose").onclick=closeQuestionDrawer; $("questionScrim").onclick=closeQuestionDrawer;
   $("questionList").onclick=function(e){ var b=e.target.closest("[data-question]"); if(b) selectQuestion(b.getAttribute("data-question")); };
   $("sortSel").onchange=function(){ idx=0; refresh(); };
@@ -915,7 +962,7 @@ function init(){
   $("addBtn").onclick=function(){ closeSheet("setScrim","setSheet"); $("aiCat").value=CATS[0]||""; if($("aiSubcat")) $("aiSubcat").value=SUBCATS[0]||""; if($("aiSubcatWrap")) $("aiSubcatWrap").hidden=!SUBCATS.length; $("aiTeam").value=""; $("aiFeat").checked=false; openSheet("addScrim","addSheet"); };
   $("addScrim").onclick=function(){ closeSheet("addScrim","addSheet"); };
   $("addSave").onclick=function(){ var t=$("aiText").value.trim(); if(!t){ $("aiText").focus(); return; }
-    DATA.push({id:rid(),text:t,name:$("aiName").value.trim(),team:$("aiTeam").value.trim(),category:$("aiCat").value.trim(),subcategory:$("aiSubcat")?$("aiSubcat").value.trim():"",question:(CONFIG.selectedQuestion&&CONFIG.selectedQuestion!=="all")?CONFIG.selectedQuestion:"",featured:$("aiFeat").checked}); computeFacets(); syncQuestionUI();
+    DATA.push({id:rid(),text:t,name:$("aiName").value.trim(),team:$("aiTeam").value.trim(),category:$("aiCat").value.trim(),subcategory:$("aiSubcat")?$("aiSubcat").value.trim():"",questionId:(CONFIG.selectedQuestion&&CONFIG.selectedQuestion!=="all")?CONFIG.selectedQuestion:"",question:"",featured:$("aiFeat").checked}); computeFacets(); syncQuestionUI();
     $("aiText").value=""; $("aiName").value=""; closeSheet("addScrim","addSheet"); idx=0; refresh(); announce("Idea added to the board."); };
 
   loadConfigFile(function(){ fetchIdeas(); startAutoRefresh(); });
@@ -936,8 +983,11 @@ function applyProjectConfig(project){
   CONFIG.ideasCsvUrl=project.ideasCsvUrl||"";
   CONFIG.refreshSeconds=String(project.refreshSeconds||CONFIG.refreshSeconds||"30");
   if(project.boardGroupBy) CONFIG.boardGroupBy=String(project.boardGroupBy);
+  if(Array.isArray(project.questions)) CONFIG.questions=project.questions;
   if(project.selectedQuestion) CONFIG.selectedQuestion=String(project.selectedQuestion);
-  $("qText").textContent=CONFIG.question;
+  QUESTIONS=normalizeQuestions(CONFIG.questions);
+  if(QUESTIONS.length && !questionById(CONFIG.selectedQuestion)) CONFIG.selectedQuestion=QUESTIONS[0].id;
+  syncQuestionUI();
 }
 function loadConfigFile(done){
   fetch("./config.json",{cache:"no-store"}).then(function(r){ if(!r.ok) throw 0; return r.json(); })
@@ -951,10 +1001,13 @@ function loadConfigFile(done){
         if(cfg.ideasCsvUrl){ CONFIG.ideasCsvUrl=cfg.ideasCsvUrl; }
         if(cfg.refreshSeconds){ CONFIG.refreshSeconds=String(cfg.refreshSeconds); }
         if(cfg.boardGroupBy){ CONFIG.boardGroupBy=String(cfg.boardGroupBy); }
+        if(Array.isArray(cfg.questions)){ CONFIG.questions=cfg.questions; }
         if(cfg.selectedQuestion){ CONFIG.selectedQuestion=String(cfg.selectedQuestion); }
         CONFIG.projectId="default";
         CONFIG.projectName="";
-        $("qText").textContent=CONFIG.question;
+        QUESTIONS=normalizeQuestions(CONFIG.questions);
+        if(QUESTIONS.length && !questionById(CONFIG.selectedQuestion)) CONFIG.selectedQuestion=QUESTIONS[0].id;
+        syncQuestionUI();
       }
       deployedConfig=true;
       saveConfig();
