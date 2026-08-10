@@ -1,7 +1,7 @@
 {
-  "question": "What is your idea to help our office improve?",
-  "formUrl": "https://forms.google.com/YOUR-FORM-LINK",
-  "ideasCsvUrl": "https://docs.google.com/spreadsheets/d/e/YOUR-PUBLISHED-SHEET/pub?output=csv",
+  "question": "What's on your mind?",
+  "formUrl": "https://forms.gle/upyAveQBsaWHVyYU6",
+  "ideasCsvUrl": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRVJKAaduPFwok5P-Jh6Tmvzr2Tuh6vEaaWweqgGasrqcw_hgrAUxZxUvkzpDpnRA6QWxZR6Mh0ijzx/pub?output=csv",
   "refreshSeconds": 30,
   "boardGroupBy": "category",
   "selectedQuestion": ""
