@@ -26,6 +26,7 @@
   Team      : team | group | department | unit | office
   Category  : category | tag | theme | type
   Subcategory: subcategory | sub category | sub-category | subtheme | sub-theme
+  Question  : question | prompt | discussion question
   Featured  : featured | star | highlight | pin
               Put y in this column to feature a card. Featured cards
               get a badge and rise to the top under "Featured first".
@@ -33,8 +34,11 @@
   Categories and Teams are read straight from the file. Whatever is
   in those columns becomes the filters and the card colours.
 
-  VIEWS: Cards (swipe), List, Grid, and Present (big card on the left,
-  the rest queued on the right) for projecting in the room.
+  VIEWS: Cards (swipe), List, Grid, Board (compact column view), and
+  Present (big card on the left, the rest queued on the right).
+
+  BOARD COLUMNS can be based on Category, Subcategory, Team, or Question.
+  The board does not assume that columns are workflow statuses.
 
   NOTE: voting has been removed for now.
 ==================================================================
@@ -57,7 +61,11 @@ h1,h2,h3,.display{font-family:"Nunito",system-ui,sans-serif}
   padding:max(14px,env(safe-area-inset-top)) 22px max(20px,env(safe-area-inset-bottom))}
 
 .topbar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}
+.topbar-left{display:flex;align-items:center;gap:7px;min-width:0}
 .brand{display:flex;align-items:center;gap:9px;font-family:"Nunito",sans-serif;font-weight:800;font-size:1.18rem;letter-spacing:-.01em}
+.question-menu-btn{width:38px;height:38px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink-soft);display:grid;place-items:center;cursor:pointer;flex:0 0 auto}
+.question-menu-btn:hover{color:var(--ink);background:#fff}
+.question-menu-btn:active{transform:scale(.95)}
 .brand .spark{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;background:linear-gradient(160deg,var(--spark),var(--spark-deep));box-shadow:0 6px 14px -6px var(--spark-deep)}
 .iconbtn{border:1px solid var(--line);background:var(--surface);color:var(--ink-soft);width:44px;height:44px;border-radius:13px;display:grid;place-items:center;cursor:pointer;transition:transform .12s ease, background .12s ease}
 .iconbtn:hover{background:#fff;color:var(--ink)}
@@ -134,6 +142,31 @@ h1,h2,h3,.display{font-family:"Nunito",system-ui,sans-serif}
 .bitem-text{font-family:"Nunito",sans-serif;font-weight:800;font-size:1.08rem;line-height:1.3;margin-bottom:8px;flex:1}
 .board.grid .bitem-text{font-size:.98rem}
 
+/* minimalist column board — inspired by the compact density of GitHub Projects */
+.projectbar{display:flex;align-items:center;gap:8px;margin:8px 0 4px;min-height:38px}
+.projectbar-label{font-size:.78rem;font-weight:700;color:var(--ink-soft);white-space:nowrap}
+.projectbar-select{position:relative;display:inline-flex;align-items:center}
+.projectbar-select select{appearance:none;border:1px solid #d0d7de;background:#fff;color:#24292f;font:inherit;font-weight:600;font-size:.82rem;padding:7px 30px 7px 10px;border-radius:7px;cursor:pointer;min-width:135px}
+.projectbar-select svg{position:absolute;right:9px;pointer-events:none;color:#656d76}
+.projectboard{width:100%;display:flex;gap:12px;align-items:flex-start;overflow-x:auto;overflow-y:hidden;padding:8px 2px 16px;scroll-snap-type:x proximity;scrollbar-width:thin}
+.projectcol{flex:0 0 292px;min-width:292px;background:#f6f8fa;border:1px solid #d8dee4;border-radius:9px;overflow:hidden;scroll-snap-align:start}
+.projectcol-head{display:flex;align-items:center;gap:8px;padding:10px 10px 9px;color:#24292f;font-size:.82rem;font-weight:700;border-bottom:1px solid #d8dee4;min-height:42px}
+.projectcol-dot{width:10px;height:10px;border-radius:50%;background:var(--col,#8c959f);flex:0 0 auto}
+.projectcol-title{min-width:0;line-height:1.25;overflow-wrap:anywhere}
+.projectcol-count{margin-left:auto;color:#656d76;font-weight:600;font-size:.76rem;background:#eaeef2;border-radius:999px;min-width:22px;height:22px;padding:0 7px;display:grid;place-items:center}
+.projectcol-body{display:flex;flex-direction:column;gap:8px;padding:8px;min-height:52px}
+.projectcard{background:#fff;border:1px solid #d0d7de;border-radius:7px;padding:11px 11px 10px;box-shadow:0 1px 0 rgba(31,35,40,.04);color:#24292f}
+.projectcard:hover{border-color:#8c959f}
+.projectcard-text{font-weight:600;font-size:.9rem;line-height:1.38;overflow-wrap:anywhere}
+.projectcard-meta{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-top:9px;color:#656d76;font-size:.72rem;font-weight:500}
+.projectcard-chip{display:inline-flex;align-items:center;max-width:100%;padding:2px 7px;border-radius:999px;background:#ddf4ff;color:#0969da;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.projectcard-star{color:#bf8700;font-size:.78rem;font-weight:800}
+.projectempty{padding:14px 10px;color:#8c959f;font-size:.8rem;text-align:center}
+@media(max-width:600px){
+  .projectboard{margin-left:-4px;margin-right:-4px}
+  .projectcol{flex-basis:min(84vw,292px);min-width:min(84vw,292px)}
+}
+
 /* present: bento board, fixed big card with the rest flowing around it */
 .present{flex:1;min-height:0;overflow:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(225px,1fr));grid-auto-rows:172px;grid-auto-flow:row dense;gap:14px;margin:12px 0 6px;align-content:start}
 .bento-big,.bento-small{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px;box-shadow:var(--shadow-soft);display:flex;flex-direction:column;overflow:hidden}
@@ -184,6 +217,30 @@ h1,h2,h3,.display{font-family:"Nunito",system-ui,sans-serif}
 .sizes button{flex:1;border:1px solid var(--line);background:#fff;border-radius:12px;cursor:pointer;padding:10px;font-family:"Nunito",sans-serif;font-weight:800;color:var(--ink-soft)}
 .sizes button[aria-pressed="true"]{border-color:var(--primary);color:var(--primary);background:color-mix(in srgb,var(--primary) 8%,#fff)}
 
+/* question switcher */
+.qscrim{position:fixed;inset:0;background:rgba(16,23,38,.38);opacity:0;pointer-events:none;transition:opacity .18s ease;z-index:70}
+.qscrim.show{opacity:1;pointer-events:auto}
+.qdrawer{position:fixed;left:0;top:0;bottom:0;width:min(88vw,330px);background:#fff;border-right:1px solid #d8dee4;box-shadow:18px 0 40px -28px rgba(31,35,40,.65);transform:translateX(-104%);transition:transform .2s cubic-bezier(.2,.8,.2,1);z-index:80;display:flex;flex-direction:column;padding:max(14px,env(safe-area-inset-top)) 12px max(14px,env(safe-area-inset-bottom))}
+.qdrawer.show{transform:translateX(0)}
+.qdrawer-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:2px 4px 10px}
+.qdrawer-title{font-family:"Nunito",sans-serif;font-size:1rem;font-weight:800;color:#24292f}
+.qdrawer-close{width:36px;height:36px;border:0;background:transparent;border-radius:8px;color:#656d76;display:grid;place-items:center;cursor:pointer}
+.qdrawer-close:hover{background:#f6f8fa;color:#24292f}
+.qdrawer-list{display:flex;flex-direction:column;gap:3px;overflow:auto;padding:2px 0 12px}
+.qdrawer-item{width:100%;border:0;background:transparent;color:#24292f;text-align:left;font:inherit;font-size:.88rem;font-weight:600;line-height:1.35;padding:10px 11px;border-radius:8px;cursor:pointer;display:flex;align-items:flex-start;gap:9px}
+.qdrawer-item:hover{background:#f6f8fa}
+.qdrawer-item[aria-current="true"]{background:#ddf4ff;color:#0969da}
+.qdrawer-check{width:16px;flex:0 0 16px;margin-top:1px;font-weight:800}
+.qdrawer-label{min-width:0;overflow-wrap:anywhere}
+.qdrawer-divider{height:1px;background:#d8dee4;margin:7px 4px}
+.qdrawer-note{font-size:.72rem;line-height:1.4;color:#8c959f;padding:8px 11px 4px}
+
+.pin-sheet{max-width:390px;text-align:center}
+.pin-lock{width:48px;height:48px;margin:2px auto 10px;border-radius:14px;background:color-mix(in srgb,var(--primary) 9%,#fff);color:var(--primary);display:grid;place-items:center}
+.pin-sheet .hint{max-width:30ch;margin-left:auto;margin-right:auto}
+.pin-input{font-family:"Inter",system-ui,sans-serif !important;font-size:1.45rem !important;font-weight:700 !important;letter-spacing:.38em;text-align:center;padding-left:calc(12px + .38em) !important}
+.pin-error{min-height:1.2em;color:#cf222e;font-size:.8rem;font-weight:600;margin-top:7px}
+
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}
 :focus-visible{outline:3px solid var(--primary);outline-offset:2px;border-radius:8px}
 
@@ -207,9 +264,14 @@ h1,h2,h3,.display{font-family:"Nunito",system-ui,sans-serif}
 <div class="app" id="app">
 
   <header class="topbar">
-    <div class="brand">
-      <span class="spark" aria-hidden="true"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M12 3a6 6 0 0 0-3.6 10.8c.5.4.8 1 .9 1.6l.2 1.1h5l.2-1.1c.1-.6.4-1.2.9-1.6A6 6 0 0 0 12 3Z" fill="#3a2a00"/><path d="M9.5 19h5M10 21h4" stroke="#3a2a00" stroke-width="1.8" stroke-linecap="round"/></svg></span>
-      Ideaspace
+    <div class="topbar-left">
+      <button class="question-menu-btn" id="questionMenuBtn" hidden aria-label="Switch question" aria-expanded="false">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+      <div class="brand">
+        <span class="spark" aria-hidden="true"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M12 3a6 6 0 0 0-3.6 10.8c.5.4.8 1 .9 1.6l.2 1.1h5l.2-1.1c.1-.6.4-1.2.9-1.6A6 6 0 0 0 12 3Z" fill="#3a2a00"/><path d="M9.5 19h5M10 21h4" stroke="#3a2a00" stroke-width="1.8" stroke-linecap="round"/></svg></span>
+        Ideaspace
+      </div>
     </div>
     <div class="topbar-actions">
       <button class="top-submit" id="topSubmitBtn" hidden aria-label="Submit idea"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/></svg><span>Submit</span></button>
@@ -259,6 +321,7 @@ h1,h2,h3,.display{font-family:"Nunito",system-ui,sans-serif}
     <button data-mode="cards" aria-pressed="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="5" y="4" width="14" height="16" rx="2" stroke="currentColor" stroke-width="1.8"/></svg>Cards</button>
     <button data-mode="list" aria-pressed="false"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>List</button>
     <button data-mode="grid" aria-pressed="false"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8"/><rect x="13" y="4" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8"/><rect x="4" y="13" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8"/><rect x="13" y="13" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.8"/></svg>Grid</button>
+    <button data-mode="project" aria-pressed="false"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="3.5" y="4.5" width="5" height="15" rx="1.5" stroke="currentColor" stroke-width="1.7"/><rect x="9.5" y="4.5" width="5" height="15" rx="1.5" stroke="currentColor" stroke-width="1.7"/><rect x="15.5" y="4.5" width="5" height="15" rx="1.5" stroke="currentColor" stroke-width="1.7"/></svg>Board</button>
     <button data-mode="present" aria-pressed="false"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="4" y="5" width="9" height="14" rx="1.6" stroke="currentColor" stroke-width="1.8"/><path d="M16 7h4M16 11h4M16 15h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>Present</button>
   </div>
 
@@ -278,6 +341,16 @@ h1,h2,h3,.display{font-family:"Nunito",system-ui,sans-serif}
 
   <!-- list / grid -->
   <div class="board" id="board" hidden></div>
+
+  <!-- compact column board -->
+  <div class="projectbar" id="projectBar" hidden>
+    <span class="projectbar-label">Columns by</span>
+    <span class="projectbar-select">
+      <select id="projectGroupSel" aria-label="Choose board columns"></select>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="m7 10 5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </span>
+  </div>
+  <div class="projectboard" id="projectBoard" hidden></div>
 
   <!-- present (bento) -->
   <div class="present" id="present" hidden></div>
@@ -303,6 +376,18 @@ h1,h2,h3,.display{font-family:"Nunito",system-ui,sans-serif}
 
 <input type="file" id="fileInput" accept=".csv,.xlsx,.xls,.json" hidden />
 
+<!-- question switcher -->
+<div class="qscrim" id="questionScrim"></div>
+<aside class="qdrawer" id="questionDrawer" aria-label="Questions" aria-hidden="true">
+  <div class="qdrawer-head">
+    <div class="qdrawer-title">Questions</div>
+    <button class="qdrawer-close" id="questionClose" aria-label="Close questions">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+  <div class="qdrawer-list" id="questionList"></div>
+</aside>
+
 <!-- text-size sheet -->
 <div class="scrim" id="textScrim"></div>
 <section class="sheet" id="textSheet" role="dialog" aria-modal="true" aria-label="Text size">
@@ -316,6 +401,23 @@ h1,h2,h3,.display{font-family:"Nunito",system-ui,sans-serif}
     <button data-size="22" aria-pressed="false">Largest</button>
   </div>
   <button class="btn" id="textDone" style="margin-top:16px;width:100%">Done</button>
+</section>
+
+<!-- organizer PIN -->
+<div class="scrim" id="pinScrim"></div>
+<section class="sheet pin-sheet" id="pinSheet" role="dialog" aria-modal="true" aria-label="Organizer PIN">
+  <div class="grab"></div>
+  <div class="pin-lock" aria-hidden="true">
+    <svg width="23" height="23" viewBox="0 0 24 24" fill="none"><rect x="5" y="10" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M8 10V7a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+  </div>
+  <h2>Organizer access</h2>
+  <p class="hint">Enter the 4-digit PIN to open settings.</p>
+  <div class="field" style="margin-bottom:6px">
+    <label class="sr" for="pinInput">Organizer PIN</label>
+    <input class="pin-input" id="pinInput" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off" placeholder="••••" />
+    <div class="pin-error" id="pinError" role="alert"></div>
+  </div>
+  <button class="btn" id="pinUnlock" style="width:100%">Unlock settings</button>
 </section>
 
 <!-- settings sheet -->
@@ -377,9 +479,10 @@ h1,h2,h3,.display{font-family:"Nunito",system-ui,sans-serif}
 "use strict";
 
 var STORE="ideaspace_v2";
+var ORGANIZER_PIN="2468";
 var CONFIG=loadConfig();
-var DATA=[];            // [{id,text,name,team,category,subcategory,featured}]
-var CATS=[], SUBCATS=[], TEAMS=[];
+var DATA=[];            // [{id,text,name,team,category,subcategory,question,featured}]
+var CATS=[], SUBCATS=[], TEAMS=[], QUESTIONS=[];
 var view=[], idx=0;
 var deployedConfig=false;
 var STATUSES=loadStatuses();
@@ -403,10 +506,12 @@ function loadConfig(){
       projectId:c.projectId||"default",
       projectName:c.projectName||"",
       size:c.size||"17",
-      viewMode:c.viewMode||"cards"
+      viewMode:c.viewMode||"cards",
+      boardGroupBy:c.boardGroupBy||"category",
+      selectedQuestion:c.selectedQuestion||""
     };
   }catch(e){
-    return {question:"What is your idea to help our office improve?",formUrl:"",ideasCsvUrl:"",refreshSeconds:"30",projectId:"default",projectName:"",size:"17",viewMode:"cards"};
+    return {question:"What is your idea to help our office improve?",formUrl:"",ideasCsvUrl:"",refreshSeconds:"30",projectId:"default",projectName:"",size:"17",viewMode:"cards",boardGroupBy:"category",selectedQuestion:""};
   }
 }
 function saveConfig(){ localStorage.setItem(STORE+"_cfg",JSON.stringify(CONFIG)); }
@@ -416,11 +521,12 @@ function esc(s){ return String(s==null?"":s).replace(/[&<>"]/g,function(c){retur
 function rid(){ return "ix"+Math.random().toString(36).slice(2,9); }
 
 function computeFacets(){
-  CATS=[]; SUBCATS=[]; TEAMS=[]; var sc={}, ss={}, st={};
+  CATS=[]; SUBCATS=[]; TEAMS=[]; QUESTIONS=[]; var sc={}, ss={}, st={}, sq={};
   DATA.forEach(function(d){
     if(d.category){ var k=String(d.category).trim(),lk=k.toLowerCase(); if(k&&!sc[lk]){ sc[lk]=1; CATS.push(k); } }
     if(d.subcategory){ var sk=String(d.subcategory).trim(),sl=sk.toLowerCase(); if(sk&&!ss[sl]){ ss[sl]=1; SUBCATS.push(sk); } }
     if(d.team){ var t=String(d.team).trim(),lt=t.toLowerCase(); if(t&&!st[lt]){ st[lt]=1; TEAMS.push(t); } }
+    if(d.question){ var q=String(d.question).trim(),lq=q.toLowerCase(); if(q&&!sq[lq]){ sq[lq]=1; QUESTIONS.push(q); } }
   });
 }
 function catColor(cat){ if(!cat) return "#64748B"; var i=CATS.findIndex(function(c){return c.toLowerCase()===String(cat).toLowerCase();}); return CAT_COLORS[(i<0?CAT_COLORS.length-1:i)%CAT_COLORS.length]; }
@@ -443,12 +549,21 @@ function normalizeRows(rows){
       team:pick(["team","group","department","unit","office","section"]),
       category:pick(["category","tag","theme","type"]),
       subcategory:pick(["subcategory","sub category","sub-category","subtheme","sub theme","sub-theme","sub category/tag","sub-category/tag"]),
+      question:pick(["question","prompt","discussion question","question / prompt","question/prompt"]),
       featured:truthy(pick(["featured","feature","star","highlight","pin","spotlight"]))
     });
   });
   return out;
 }
-function setData(rows,label){ DATA=normalizeRows(rows); computeFacets(); idx=0; refresh(); announce(DATA.length+" ideas loaded"+(label?" from "+label:"")); }
+function setData(rows,label){
+  DATA=normalizeRows(rows); computeFacets();
+  if(QUESTIONS.length){
+    var current=String(CONFIG.selectedQuestion||"");
+    var valid=current==="all"||QUESTIONS.some(function(q){return q.toLowerCase()===current.toLowerCase();});
+    if(!valid) CONFIG.selectedQuestion=QUESTIONS[0];
+  } else CONFIG.selectedQuestion="";
+  idx=0; syncQuestionUI(); refresh(); announce(DATA.length+" ideas loaded"+(label?" from "+label:""));
+}
 function parseCSV(text){
   var rows=[],row=[],field="",i=0,inq=false,c;
   function pf(){ row.push(field); field=""; } function pr(){ pf(); rows.push(row); row=[]; }
@@ -477,13 +592,15 @@ function loadSheetJS(cb){ if(sjsReady) return cb(true); sjsCbs.push(cb); if(sjsL
 /* ---------- view ---------- */
 function buildView(){
   var cat=$("catSel").value, subcat=$("subcatSel")?$("subcatSel").value:"all", team=$("teamSel").value, sort=$("sortSel").value, status=$("statusSel")?$("statusSel").value:"all";
+  var selectedQ=String(CONFIG.selectedQuestion||"");
   view=DATA.filter(function(d){
+    var okQ = !selectedQ||selectedQ==="all"||String(d.question||"").toLowerCase()===selectedQ.toLowerCase();
     var okC = cat==="all"||String(d.category).toLowerCase()===cat.toLowerCase();
     var okSC = subcat==="all"||String(d.subcategory||"").toLowerCase()===subcat.toLowerCase();
     var okT = team==="all"||String(d.team).toLowerCase()===team.toLowerCase();
     var okS = status==="all"||getStatus(d)===status;
     var okF = sort!=="featuredOnly"||!!d.featured;
-    return okC&&okSC&&okT&&okS&&okF;
+    return okQ&&okC&&okSC&&okT&&okS&&okF;
   });
   if(sort==="random"){ view.sort(function(){ return Math.random()-.5; }); }
   else { view.reverse(); }
@@ -492,22 +609,35 @@ function buildView(){
 
 /* ---------- render ---------- */
 function refresh(){
-  buildView(); renderStats(); renderControls();
+  syncQuestionUI(); buildView(); renderStats(); renderControls();
   var has=DATA.length>0, m=CONFIG.viewMode;
-  $("empty").hidden=has; $("controls").hidden=!has; $("viewToggle").hidden=!has; $("shareBtn").hidden=!has; if($("topSubmitBtn")) $("topSubmitBtn").hidden=!CONFIG.formUrl;
+  $("empty").hidden=has; $("controls").hidden=!has; $("viewToggle").hidden=!has; $("shareBtn").hidden=!has||!CONFIG.formUrl; if($("topSubmitBtn")) $("topSubmitBtn").hidden=!CONFIG.formUrl;
   $("deck").hidden=!has||m!=="cards";
   $("board").hidden=!has||(m!=="list"&&m!=="grid");
+  $("projectBar").hidden=!has||m!=="project";
+  $("projectBoard").hidden=!has||m!=="project";
   $("present").hidden=!has||m!=="present";
-  if(has){ if(m==="cards")renderCard(); else if(m==="present")renderPresent(); else renderBoard(); }
+  if(has){
+    if(m==="cards") renderCard();
+    else if(m==="present") renderPresent();
+    else if(m==="project"){ renderProjectControl(); renderProjectBoard(); }
+    else renderBoard();
+  }
+}
+function questionScopedData(){
+  var q=String(CONFIG.selectedQuestion||"");
+  if(!q||q==="all") return DATA.slice();
+  return DATA.filter(function(d){return String(d.question||"").toLowerCase()===q.toLowerCase();});
 }
 function renderStats(){
-  var el=$("stats"); if(!DATA.length){ el.innerHTML=""; return; }
-  var people={}; DATA.forEach(function(d){ var n=String(d.name||"").trim(); if(n) people[n.toLowerCase()]=true; });
-  var feat=DATA.filter(function(d){return d.featured;}).length;
-  var short=statusCount("shortlisted"), action=statusCount("action"), done=statusCount("done");
-  el.innerHTML=statChip("💡",DATA.length,DATA.length===1?"idea":"ideas")
+  var el=$("stats"), base=questionScopedData(); if(!DATA.length){ el.innerHTML=""; return; }
+  var people={}, teams={}; base.forEach(function(d){ var n=String(d.name||"").trim(),t=String(d.team||"").trim(); if(n) people[n.toLowerCase()]=true; if(t) teams[t.toLowerCase()]=true; });
+  var feat=base.filter(function(d){return d.featured;}).length;
+  function sc(st){return base.filter(function(d){return getStatus(d)===st;}).length;}
+  var short=sc("shortlisted"), action=sc("action"), done=sc("done");
+  el.innerHTML=statChip("💡",base.length,base.length===1?"idea":"ideas")
     +(Object.keys(people).length?statChip("🙋",Object.keys(people).length,"people"):"")
-    +(TEAMS.length?statChip("👥",TEAMS.length,TEAMS.length===1?"team":"teams"):"")
+    +(Object.keys(teams).length?statChip("👥",Object.keys(teams).length,Object.keys(teams).length===1?"team":"teams"):"")
     +(feat?statChip("★",feat,"featured"):"")
     +(short?statChip("◆",short,"shortlisted"):"")
     +(action?statChip("⚑",action,"action items"):"")
@@ -566,6 +696,80 @@ function renderBoard(){
   b.innerHTML=view.map(boardItemHTML).join("");
   announce(view.length+" ideas shown in "+CONFIG.viewMode+" view");
 }
+function availableProjectFields(){
+  var fields=[];
+  if(DATA.some(function(d){return d.category;})) fields.push({key:"category",label:"Category"});
+  if((!CONFIG.selectedQuestion||CONFIG.selectedQuestion==="all") && DATA.some(function(d){return d.question;})) fields.push({key:"question",label:"Question"});
+  if(DATA.some(function(d){return d.subcategory;})) fields.push({key:"subcategory",label:"Subcategory"});
+  if(DATA.some(function(d){return d.team;})) fields.push({key:"team",label:"Team"});
+  if(!fields.length) fields.push({key:"none",label:"All ideas"});
+  return fields;
+}
+function renderProjectControl(){
+  var sel=$("projectGroupSel"), fields=availableProjectFields();
+  if(!fields.some(function(f){return f.key===CONFIG.boardGroupBy;})) CONFIG.boardGroupBy=fields[0].key;
+  sel.innerHTML=fields.map(function(f){ return '<option value="'+f.key+'">'+esc(f.label)+'</option>'; }).join("");
+  sel.value=CONFIG.boardGroupBy;
+}
+function projectGroupValue(d,key){
+  if(key==="none") return "Ideas";
+  var v=String(d[key]||"").trim();
+  return v||"Other";
+}
+function projectCardHTML(d,groupKey){
+  var meta=[];
+  if(d.featured) meta.push('<span class="projectcard-star">★ Featured</span>');
+  if(d.name) meta.push('<span>'+esc(d.name)+'</span>');
+  if(d.team && groupKey!=="team") meta.push('<span>'+esc(d.team)+'</span>');
+  if(d.category && groupKey!=="category") meta.push('<span class="projectcard-chip">'+esc(d.category)+'</span>');
+  if(d.subcategory && groupKey!=="subcategory") meta.push('<span class="projectcard-chip">'+esc(d.subcategory)+'</span>');
+  return '<article class="projectcard"><div class="projectcard-text">'+esc(d.text)+'</div>'+(meta.length?'<div class="projectcard-meta">'+meta.join('<span aria-hidden="true">·</span>')+'</div>':'')+'</article>';
+}
+function renderProjectBoard(){
+  var wrap=$("projectBoard"), key=CONFIG.boardGroupBy||"category";
+  if(!view.length){ wrap.innerHTML='<div class="projectempty">No ideas in this filter.</div>'; return; }
+  var groups=[], lookup={};
+  view.forEach(function(d){
+    var label=projectGroupValue(d,key), mapKey=label.toLowerCase();
+    if(!lookup[mapKey]){ lookup[mapKey]={label:label,items:[]}; groups.push(lookup[mapKey]); }
+    lookup[mapKey].items.push(d);
+  });
+  wrap.innerHTML=groups.map(function(g,i){
+    var color=CAT_COLORS[i%CAT_COLORS.length];
+    return '<section class="projectcol" style="--col:'+color+'"><header class="projectcol-head"><span class="projectcol-dot" aria-hidden="true"></span><span class="projectcol-title">'+esc(g.label)+'</span><span class="projectcol-count">'+g.items.length+'</span></header><div class="projectcol-body">'+g.items.map(function(d){return projectCardHTML(d,key);}).join("")+'</div></section>';
+  }).join("");
+  announce(view.length+" ideas shown in board view, grouped by "+key+".");
+}
+function openQuestionDrawer(){
+  if(QUESTIONS.length<2) return;
+  $("questionScrim").classList.add("show"); $("questionDrawer").classList.add("show");
+  $("questionDrawer").setAttribute("aria-hidden","false"); $("questionMenuBtn").setAttribute("aria-expanded","true");
+}
+function closeQuestionDrawer(){
+  $("questionScrim").classList.remove("show"); $("questionDrawer").classList.remove("show");
+  $("questionDrawer").setAttribute("aria-hidden","true"); $("questionMenuBtn").setAttribute("aria-expanded","false");
+}
+function questionMenuItem(value,label){
+  var active=String(CONFIG.selectedQuestion||"").toLowerCase()===String(value).toLowerCase();
+  return '<button class="qdrawer-item" data-question="'+esc(value)+'" aria-current="'+(active?'true':'false')+'"><span class="qdrawer-check">'+(active?'✓':'')+'</span><span class="qdrawer-label">'+esc(label)+'</span></button>';
+}
+function syncQuestionUI(){
+  var btn=$("questionMenuBtn"), list=$("questionList");
+  btn.hidden=QUESTIONS.length<2;
+  if(!QUESTIONS.length){ $("qText").textContent=CONFIG.question; list.innerHTML=""; return; }
+  if(!CONFIG.selectedQuestion) CONFIG.selectedQuestion=QUESTIONS[0];
+  $("qText").textContent=CONFIG.selectedQuestion==="all"?"All questions":CONFIG.selectedQuestion;
+  var html=QUESTIONS.map(function(q){return questionMenuItem(q,q);}).join("");
+  if(QUESTIONS.length>1) html+='<div class="qdrawer-divider"></div>'+questionMenuItem("all","All questions")+'<div class="qdrawer-note">Switching questions filters every Ideaspace view.</div>';
+  list.innerHTML=html;
+}
+function selectQuestion(q){
+  CONFIG.selectedQuestion=q; saveConfig(); idx=0;
+  $("catSel").value="all"; if($("subcatSel")) $("subcatSel").value="all"; $("teamSel").value="all";
+  syncQuestionUI(); closeQuestionDrawer(); refresh();
+  announce(q==="all"?"Showing all questions.":"Showing question: "+q);
+}
+
 function bentoCardHTML(d,big){
   var tag=big?'big':'small';
   return '<article class="bento-'+tag+(d.featured?' isfeat':'')+statusClass(d)+'" data-id="'+d.id+'">'
@@ -603,16 +807,19 @@ function animate(dir){ var c=$("card"); if(window.matchMedia("(prefers-reduced-m
   document.addEventListener("touchmove",function(e){ if(x0==null)return; dx=e.touches[0].clientX-x0; var dy=e.touches[0].clientY-y0; if(Math.abs(dx)>Math.abs(dy)){ c.style.transition="none"; c.style.transform="translateX("+dx+"px) rotate("+(dx/40)+"deg)"; c.style.opacity=String(1-Math.min(Math.abs(dx)/400,.5)); } },{passive:true});
   document.addEventListener("touchend",function(){ if(x0==null)return; c.style.transition="transform .2s ease, opacity .2s ease";
     if(dx<-60&&idx<view.length-1){ idx++; renderCard(); animate(1); } else if(dx>60&&idx>0){ idx--; renderCard(); animate(-1); } else { c.style.transform="translateX(0) rotate(0)"; c.style.opacity="1"; } x0=y0=null; dx=0; }); })();
-document.addEventListener("keydown",function(e){ if(e.target.matches("input,textarea,select"))return; if(CONFIG.viewMode!=="cards"&&CONFIG.viewMode!=="present")return; if(e.key==="ArrowRight")go(1); else if(e.key==="ArrowLeft")go(-1); });
+document.addEventListener("keydown",function(e){
+  if(e.key==="Escape" && $("questionDrawer").classList.contains("show")){ closeQuestionDrawer(); return; }
+  if(e.target.matches("input,textarea,select"))return; if(CONFIG.viewMode!=="cards"&&CONFIG.viewMode!=="present")return; if(e.key==="ArrowRight")go(1); else if(e.key==="ArrowLeft")go(-1);
+});
 function announce(msg){ $("live").textContent=msg; }
 
 /* ---------- export ---------- */
 function exportResults(){
-  var hasSub=DATA.some(function(d){ return d.subcategory; });
-  var rows=DATA.map(function(d){ var r={Idea:d.text,Name:d.name||"",Team:d.team||"",Category:d.category||"",Featured:d.featured?"y":""}; if(hasSub) r.Subcategory=d.subcategory||""; return r; });
+  var hasSub=DATA.some(function(d){ return d.subcategory; }), hasQuestion=DATA.some(function(d){ return d.question; });
+  var rows=DATA.map(function(d){ var r={Idea:d.text,Name:d.name||"",Team:d.team||"",Category:d.category||""}; if(hasSub) r.Subcategory=d.subcategory||""; if(hasQuestion) r.Question=d.question||""; r.Featured=d.featured?"y":""; return r; });
   loadSheetJS(function(ok){
     if(ok){ var ws=XLSX.utils.json_to_sheet(rows),wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,"Ideas"); XLSX.writeFile(wb,"ideaspace-ideas.xlsx"); }
-    else { var head=hasSub?["Idea","Name","Team","Category","Subcategory","Featured"]:["Idea","Name","Team","Category","Featured"];
+    else { var head=["Idea","Name","Team","Category"]; if(hasSub) head.push("Subcategory"); if(hasQuestion) head.push("Question"); head.push("Featured");
       var csv=[head.join(",")].concat(rows.map(function(r){ return head.map(function(h){ var v=String(r[h]==null?"":r[h]); return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v; }).join(","); })).join("\n");
       var a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"})); a.download="ideaspace-ideas.csv"; a.click(); }
   });
@@ -626,26 +833,32 @@ function applySize(px){ document.documentElement.style.setProperty("--root",px+"
 function setView(mode){ CONFIG.viewMode=mode; saveConfig(); Array.prototype.forEach.call($("viewToggle").children,function(b){ b.setAttribute("aria-pressed",b.dataset.mode===mode?"true":"false"); }); idx=0; refresh(); }
 
 function sampleData(){ return [
-  {Idea:"Move the weekly status update to a shared dashboard so we stop sitting through read-outs.",Name:"Mara",Team:"Operations",Category:"Efficiency",Subcategory:"Meetings",Featured:"y"},
-  {Idea:"A monthly skills swap where staff teach each other one practical thing.",Name:"",Team:"People & Culture",Category:"Teamwork",Featured:""},
-  {Idea:"Pre-fill recurring travel forms so field colleagues are not re-typing the same details.",Name:"Jun",Team:"Field Support",Category:"Service",Subcategory:"Forms",Featured:"y"},
-  {Idea:"Try a no-meeting Friday morning for focused work.",Name:"Aisha",Team:"Operations",Category:"Efficiency",Featured:""},
-  {Idea:"One shared glossary for our acronyms so new joiners are not lost in week one.",Name:"",Team:"Communications",Category:"Innovation",Featured:""},
-  {Idea:"Rotate who facilitates team check-ins so it is not always the same person.",Name:"Leo",Team:"People & Culture",Category:"Teamwork",Featured:""}
+  {Idea:"Move the weekly status update to a shared dashboard so we stop sitting through read-outs.",Name:"Mara",Team:"Operations",Category:"Efficiency",Subcategory:"Meetings",Question:"What should we improve?",Featured:"y"},
+  {Idea:"A monthly skills swap where staff teach each other one practical thing.",Name:"",Team:"People & Culture",Category:"Teamwork",Question:"What should we start?",Featured:""},
+  {Idea:"Pre-fill recurring travel forms so field colleagues are not re-typing the same details.",Name:"Jun",Team:"Field Support",Category:"Service",Subcategory:"Forms",Question:"What should we improve?",Featured:"y"},
+  {Idea:"Try a no-meeting Friday morning for focused work.",Name:"Aisha",Team:"Operations",Category:"Efficiency",Question:"What should we try?",Featured:""},
+  {Idea:"One shared glossary for our acronyms so new joiners are not lost in week one.",Name:"",Team:"Communications",Category:"Innovation",Question:"What should we start?",Featured:""},
+  {Idea:"Rotate who facilitates team check-ins so it is not always the same person.",Name:"Leo",Team:"People & Culture",Category:"Teamwork",Question:"What should we try?",Featured:""}
 ]; }
 
 /* ---------- init ---------- */
 function init(){
   applySize(CONFIG.size); setView(CONFIG.viewMode); $("qText").textContent=CONFIG.question;
+  $("questionMenuBtn").onclick=openQuestionDrawer; $("questionClose").onclick=closeQuestionDrawer; $("questionScrim").onclick=closeQuestionDrawer;
+  $("questionList").onclick=function(e){ var b=e.target.closest("[data-question]"); if(b) selectQuestion(b.getAttribute("data-question")); };
   $("sortSel").onchange=function(){ idx=0; refresh(); };
   $("catSel").onchange=function(){ idx=0; refresh(); };
   if($("subcatSel")) $("subcatSel").onchange=function(){ idx=0; refresh(); };
   $("teamSel").onchange=function(){ idx=0; refresh(); };
   $("statusSel").onchange=function(){ idx=0; refresh(); };
+  $("projectGroupSel").onchange=function(){ CONFIG.boardGroupBy=this.value; saveConfig(); renderProjectBoard(); };
   $("prevBtn").onclick=function(){ go(-1); };
   $("nextBtn").onclick=function(){ go(1); };
   Array.prototype.forEach.call($("viewToggle").children,function(b){ b.onclick=function(){ setView(b.dataset.mode); }; });
-  function openSubmitForm(){ if(CONFIG.formUrl){ window.open(CONFIG.formUrl,"_blank","noopener"); } else { openSheet("setScrim","setSheet"); announce("Add a form link so participants can share ideas."); } }
+  function openSubmitForm(){
+    if(CONFIG.formUrl){ window.open(CONFIG.formUrl,"_blank","noopener"); }
+    else { announce("Idea submission is not available right now."); }
+  }
   $("shareBtn").onclick=openSubmitForm;
   if($("topSubmitBtn")) $("topSubmitBtn").onclick=openSubmitForm;
 
@@ -659,16 +872,50 @@ function init(){
   $("textScrim").onclick=function(){ closeSheet("textScrim","textSheet"); };
   Array.prototype.forEach.call(document.querySelectorAll("#sizes button"),function(b){ b.onclick=function(){ applySize(b.dataset.size); }; });
 
-  $("gearBtn").onclick=function(){ $("qInput").value=CONFIG.question; $("formInput").value=CONFIG.formUrl; $("csvInput").value=CONFIG.ideasCsvUrl||""; $("refreshInput").value=CONFIG.refreshSeconds||"30"; $("cfgNote").style.display=deployedConfig?"block":"none"; var n=Object.keys(STATUSES).length; $("restoreBtn").textContent="Reset idea statuses"+(n?" ("+n+")":""); $("restoreBtn").disabled=!n; openSheet("setScrim","setSheet"); };
+  function openOrganizerSettings(){
+    $("qInput").value=CONFIG.question;
+    $("formInput").value=CONFIG.formUrl;
+    $("csvInput").value=CONFIG.ideasCsvUrl||"";
+    $("refreshInput").value=CONFIG.refreshSeconds||"30";
+    $("cfgNote").style.display=deployedConfig?"block":"none";
+    var n=Object.keys(STATUSES).length;
+    $("restoreBtn").textContent="Reset idea statuses"+(n?" ("+n+")":"");
+    $("restoreBtn").disabled=!n;
+    openSheet("setScrim","setSheet");
+  }
+  function openPinGate(){
+    $("pinInput").value="";
+    $("pinError").textContent="";
+    openSheet("pinScrim","pinSheet");
+    setTimeout(function(){ $("pinInput").focus(); },80);
+  }
+  function tryUnlockSettings(){
+    var entered=$("pinInput").value.replace(/\D/g,"");
+    if(entered===ORGANIZER_PIN){
+      closeSheet("pinScrim","pinSheet");
+      $("pinInput").value="";
+      $("pinError").textContent="";
+      openOrganizerSettings();
+    } else {
+      $("pinError").textContent="Incorrect PIN.";
+      $("pinInput").value="";
+      $("pinInput").focus();
+    }
+  }
+  $("gearBtn").onclick=openPinGate;
+  $("pinUnlock").onclick=tryUnlockSettings;
+  $("pinInput").oninput=function(){ this.value=this.value.replace(/\D/g,"").slice(0,4); $("pinError").textContent=""; };
+  $("pinInput").onkeydown=function(e){ if(e.key==="Enter") tryUnlockSettings(); };
+  $("pinScrim").onclick=function(){ closeSheet("pinScrim","pinSheet"); $("pinInput").value=""; $("pinError").textContent=""; };
   $("restoreBtn").onclick=function(){ resetStatuses(); closeSheet("setScrim","setSheet"); };
-  $("setDone").onclick=function(){ CONFIG.question=$("qInput").value.trim()||CONFIG.question; CONFIG.formUrl=$("formInput").value.trim(); CONFIG.ideasCsvUrl=$("csvInput").value.trim(); CONFIG.refreshSeconds=$("refreshInput").value.trim()||"30"; saveConfig(); $("qText").textContent=CONFIG.question; closeSheet("setScrim","setSheet"); fetchIdeas(); startAutoRefresh(); };
+  $("setDone").onclick=function(){ CONFIG.question=$("qInput").value.trim()||CONFIG.question; CONFIG.formUrl=$("formInput").value.trim(); CONFIG.ideasCsvUrl=$("csvInput").value.trim(); CONFIG.refreshSeconds=$("refreshInput").value.trim()||"30"; saveConfig(); syncQuestionUI(); closeSheet("setScrim","setSheet"); fetchIdeas(); startAutoRefresh(); };
   $("setScrim").onclick=function(){ closeSheet("setScrim","setSheet"); };
   $("exportBtn").onclick=exportResults;
 
   $("addBtn").onclick=function(){ closeSheet("setScrim","setSheet"); $("aiCat").value=CATS[0]||""; if($("aiSubcat")) $("aiSubcat").value=SUBCATS[0]||""; if($("aiSubcatWrap")) $("aiSubcatWrap").hidden=!SUBCATS.length; $("aiTeam").value=""; $("aiFeat").checked=false; openSheet("addScrim","addSheet"); };
   $("addScrim").onclick=function(){ closeSheet("addScrim","addSheet"); };
   $("addSave").onclick=function(){ var t=$("aiText").value.trim(); if(!t){ $("aiText").focus(); return; }
-    DATA.push({id:rid(),text:t,name:$("aiName").value.trim(),team:$("aiTeam").value.trim(),category:$("aiCat").value.trim(),subcategory:$("aiSubcat")?$("aiSubcat").value.trim():"",featured:$("aiFeat").checked}); computeFacets();
+    DATA.push({id:rid(),text:t,name:$("aiName").value.trim(),team:$("aiTeam").value.trim(),category:$("aiCat").value.trim(),subcategory:$("aiSubcat")?$("aiSubcat").value.trim():"",question:(CONFIG.selectedQuestion&&CONFIG.selectedQuestion!=="all")?CONFIG.selectedQuestion:"",featured:$("aiFeat").checked}); computeFacets(); syncQuestionUI();
     $("aiText").value=""; $("aiName").value=""; closeSheet("addScrim","addSheet"); idx=0; refresh(); announce("Idea added to the board."); };
 
   loadConfigFile(function(){ fetchIdeas(); startAutoRefresh(); });
@@ -688,6 +935,8 @@ function applyProjectConfig(project){
   CONFIG.formUrl=project.formUrl||"";
   CONFIG.ideasCsvUrl=project.ideasCsvUrl||"";
   CONFIG.refreshSeconds=String(project.refreshSeconds||CONFIG.refreshSeconds||"30");
+  if(project.boardGroupBy) CONFIG.boardGroupBy=String(project.boardGroupBy);
+  if(project.selectedQuestion) CONFIG.selectedQuestion=String(project.selectedQuestion);
   $("qText").textContent=CONFIG.question;
 }
 function loadConfigFile(done){
@@ -701,6 +950,8 @@ function loadConfigFile(done){
         if(cfg.formUrl){ CONFIG.formUrl=cfg.formUrl; }
         if(cfg.ideasCsvUrl){ CONFIG.ideasCsvUrl=cfg.ideasCsvUrl; }
         if(cfg.refreshSeconds){ CONFIG.refreshSeconds=String(cfg.refreshSeconds); }
+        if(cfg.boardGroupBy){ CONFIG.boardGroupBy=String(cfg.boardGroupBy); }
+        if(cfg.selectedQuestion){ CONFIG.selectedQuestion=String(cfg.selectedQuestion); }
         CONFIG.projectId="default";
         CONFIG.projectName="";
         $("qText").textContent=CONFIG.question;
